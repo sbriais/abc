@@ -1,0 +1,3 @@
+agent Zero(c) = c(z,s).'z.Zero(c)
+agent Succ(c,n) = c(z,s).'s<n>.Succ(c,n)
+agent Sup2(n,true,false) = (^caseZero,caseSucc)('n<caseZero,caseSucc> | (caseZero.'false + caseSucc(n).'n<caseZero,caseSucc>.(caseZero.'false + caseSucc(n).'true)))
