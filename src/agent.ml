@@ -366,7 +366,12 @@ let rec standard_form env lvl = function
 	       if Name.is_zero n then Nu(standard_form env (lvl+1) (Conc(Name.zero,Nu(beta_swap q))))
 	       else Nu(Nu(Conc(n,q)))
 	   | Nil -> Nil
-	   | q -> Nu(q))
+	   | q -> 
+	       (try
+		  let q = substitute_agent (function n -> Name.pred n) q 
+		  in q
+		with
+		    e -> Nu(q)))
   | Sum(ps) ->
       let rec simpl_sum ps =
 	AgentMultiset.fold (fun p n (ps,c) -> 
