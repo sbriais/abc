@@ -1,7 +1,7 @@
 INIT(abc)
 VERSION(1.0.1)
 SOURCES(agent.ml agent_parse.ml conditions.mli conditions.ml distinctions.mli distinctions.ml main.ml multiset.mli multiset.ml name.mli name.ml commands.ml pprinter.ml parser.ml compile_info.ml)
-EXTRA(README)
+EXTRA(make_ocaml Makefile.am README LICENSE abc_ug.ps)
 USE_LEXER()
 dnl USE_PARSER()
 LIBRARIES(unix.cma)
