@@ -50,6 +50,20 @@ may want to edit is Makefile.am. Then, the script make_ocaml inspects
 the file Makefile.am and builds with the help of the Makefile.in
 (which is some kind of pattern) a Makefile.
 
+Line editor:
+------------
+
+You will notice quickly that the toplevel of ABC is not really
+user-friendly. To enhance the ABC, we strongly advise you to install
+'ledit' which is a tool made by Daniel de Rauglaudre that gives any
+program a true line editor à la emacs.
+You can make a little shell script that launch abc with ledit:
+
+#!/bin/sh
+ledit /usr/local/abc/abc
+
+assuming that ledit is in your path.
+
 License:
 --------
 The license is contained in the file LICENSE.
@@ -65,3 +79,4 @@ Linux Mandrake web site: http://www.linux-mandrake.com/
 Linux RedHat web site  : http://www.redhat.com/
 Cygwin web site        : http://www.cygwin.com/
 OCaml web site         : http://caml.inria.fr/
+Ledit                  : http://cristal.inria.fr/~ddr/
