@@ -61,8 +61,10 @@ $(PRGM).opt : $(CMX) $(CMI)
 $(PRGM) : $(OBJS) $(CMI) 
 	$(CAMLC) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
 
-date_of_compile.ml:
-	@echo "let date_of_compile=\""`date`"\";;" > date_of_compile.ml
+compile_info.ml: Makefile
+	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
+	@echo "let version=\""$(VERSION)"\";;" >> compile_info.ml
+	@echo "let build_info=\""`uname -a`"\";;" >> compile_info.ml
 
 @@LEXERRULE1@@
 	@@LEXERRULE1B@@
@@ -87,7 +89,7 @@ date_of_compile.ml:
 	$(CC) $(CFLAGS) -I$(CAMLLIBPATH)/caml -c $<
 
 clean:
-	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(SPECML) $(SPECMLI) parser.output date_of_compile.ml .depend *~
+	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(SPECML) $(SPECMLI) parser.output compile_info.ml .depend *~
 	touch .depend
 
 depend: .depend

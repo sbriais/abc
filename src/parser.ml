@@ -334,7 +334,8 @@ let rec command lexer =
     | LOAD ->
 	(match lexer#top_token with
 	     VAR(s)
-	   | IDENT(s) ->
+	   | IDENT(s)
+	   | FILENAME(s) ->
 	       let _ = lexer#pop_token in
 		 parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
 		 Commands.Load(s)

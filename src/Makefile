@@ -28,17 +28,17 @@ LINKFLAGS=
 LEXFLAGS=
 YACCFLAGS=-v
 CPP=/lib/cpp -P -DVERSION=$(VERSION)
-CAMLLIBPATH=/usr/local/lib/ocaml
+CAMLLIBPATH=`$CAMLC -where`
 
 LIBS =  unix.cma
 MMAKE=make_ocaml
 LEXERANDPARSER=lexer.mll
-DISTML= agent.ml agent_parse.ml  conditions.ml  distinctions.ml main.ml  multiset.ml  name.ml commands.ml pprinter.ml parser.ml
+DISTML= agent.ml agent_parse.ml  conditions.ml  distinctions.ml main.ml  multiset.ml  name.ml commands.ml pprinter.ml parser.ml compile_info.ml
 SPECML= lexer.ml
-DISTMLI=   conditions.mli  distinctions.mli   multiset.mli  name.mli     
+DISTMLI=   conditions.mli  distinctions.mli   multiset.mli  name.mli      
 SPECMLI= 
-CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multiset.cmi name.cmi commands.cmi pprinter.cmi parser.cmi conditions.cmi distinctions.cmi multiset.cmi name.cmi  lexer.cmi  
-OBJS= conditions.cmo distinctions.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
+CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multiset.cmi name.cmi commands.cmi pprinter.cmi parser.cmi compile_info.cmi conditions.cmi distinctions.cmi multiset.cmi name.cmi  lexer.cmi  
+OBJS= conditions.cmo distinctions.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo compile_info.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
 CMX = $(OBJS:.cmo=.cmx)
 
 EXTRADIST = README Makefile
@@ -61,8 +61,10 @@ $(PRGM).opt : $(CMX) $(CMI)
 $(PRGM) : $(OBJS) $(CMI) 
 	$(CAMLC) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
 
-date_of_compile.ml:
-	@echo "let date_of_compile=\""`date`"\";;" > date_of_compile.ml
+compile_info.ml: Makefile
+	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
+	@echo "let version=\""$(VERSION)"\";;" >> compile_info.ml
+	@echo "let build_info=\""`uname -a`"\";;" >> compile_info.ml
 
 lexer.ml: lexer.mll 
 	$(CAMLLEX) $(LEXFLAGS) lexer.mll
@@ -87,7 +89,7 @@ lexer.ml: lexer.mll
 	$(CC) $(CFLAGS) -I$(CAMLLIBPATH)/caml -c $<
 
 clean:
-	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(SPECML) $(SPECMLI) parser.output date_of_compile.ml .depend *~
+	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(SPECML) $(SPECMLI) parser.output compile_info.ml .depend *~
 	touch .depend
 
 depend: .depend

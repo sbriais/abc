@@ -3,6 +3,7 @@
   type token =
       VAR of (string)
     | IDENT of (string)
+    | FILENAME of (string)
     | INT of (int)
     | NU
     | LAMBDA
@@ -185,6 +186,9 @@ rule command = parse
 					     }
   | ['A'-'Z']['/''_''A'-'Z''a'-'z''0'-'9']*  { IDENT(Lexing.lexeme lexbuf) }
   | ['0'-'9']+     { INT(int_of_string(Lexing.lexeme lexbuf)) }
+  | '"'[^'"']*'"'  { let name = Lexing.lexeme lexbuf in
+		       FILENAME(String.sub name 1 ((String.length name)-2))
+		   }
   | '^'            { NU }
   | '\\'           { LAMBDA }
   | '.'            { DOT }
