@@ -67,7 +67,7 @@
 
   exception Eof
 
-  let keyword_table = Hashtbl.create 53
+  let keyword_table = Hashtbl.create 20
   let _ =
     List.iter (fun (kwd, tok) -> Hashtbl.add keyword_table kwd tok)
       [ "agent", AGENT;

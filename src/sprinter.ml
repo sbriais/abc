@@ -36,6 +36,54 @@ let string_of_action lvl = function
   | Input(n) -> string_of_var lvl n
   | Output(n) -> "'"^(string_of_var lvl n)
 
+let rec string_of_agent lvl = function
+    Nil -> "0"
+  | Prefix(a,p) -> 
+      (string_of_action lvl a)^"."^(string_of_agent lvl p)
+  | Conc(n,p) -> ("["^(string_of_var lvl n)^"]"^(string_of_agent lvl p))
+  | Abs(p) ->
+      let rec aux lvl = function
+	  Abs(q) -> ","^(string_of_var (lvl+1) Name.zero)^(aux (lvl+1) q)
+	| q -> ")"^(string_of_agent lvl q)
+      in
+	("(\\"^(string_of_var (lvl+1) (Name.zero))^(aux (lvl+1) p))
+  | Nu(p) -> 
+      let rec aux lvl = function
+	  Nu(q) -> ","^(string_of_var (lvl+1) Name.zero)^(aux (lvl+1) q)
+	| q -> ")"^(string_of_agent lvl q)
+      in
+	("(^"^(string_of_var (lvl+1) (Name.zero))^(aux (lvl+1) p))
+  | Match(n,m,p) -> ("["^(string_of_var lvl n)^"="^(string_of_var lvl m)^"]"^(string_of_agent lvl p))
+  | AgentRef(s) -> s
+  | Apply(p,n) -> (string_of_agent lvl p)^" "^(string_of_var lvl n)
+  | Sum(ps) -> 
+      let str = (List.fold_left
+		   (fun str p -> 
+		      let strp = string_of_agent lvl p in
+			(str^(if str = "" then "" else " + ")^strp)) "" (AgentMultiset.elements ps)) 
+      in "("^str^")"
+  | Parallel(ps) ->
+      let str = (List.fold_left
+		   (fun str p -> 
+		      let strp = string_of_agent lvl p in
+			(str^(if str = "" then "" else " | ")^strp)) "" (AgentMultiset.elements ps)) 
+      in "("^str^")"
+  
+let string_of_agent_simple = string_of_agent
+
+let rec string_of_list f g = function
+    [] -> ""
+  | [x] -> (f x)
+  | x::xs -> (f x)^(g ())^(string_of_list f g xs)
+
+(* l should be NameCond.elements c *)
+let string_of_cond lvl l = 
+  "{"^(string_of_list (string_of_list (string_of_var lvl) (function () -> "=")) (function () -> ",") l)^"}"
+
+(* l should be NameDist.elements d *)
+let string_of_dist lvl l = 
+  "{"^(string_of_list (function (x,y) -> "("^(string_of_var lvl x)^","^(string_of_var lvl y)^")") (function () -> "") l)^"}"
+
 exception DFound of (int*Agent.agent)
 
 let (get_entry,reset_entries,flush_entries,is_flushed) =
