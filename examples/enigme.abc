@@ -9,7 +9,7 @@ agent Sup2(n,true,false) = (^caseZero,caseSucc)
 
 agent Joueur(n,left,right) =   left.(^c)(Succ(c,n) | Joueur(c,left,right)) \
 			     + right.(^c)(Succ(c,n) | Joueur(c,left,right)) \
-			     + (^caseTrue,caseFalse)
+			     + (^caseTrue,caseFalse) \
 				(  Sup2(n,caseTrue,caseFalse) \
 				 | (  caseFalse.Joueur(n,left,right) \
 				    + caseTrue(n).'left.'right. \ 
