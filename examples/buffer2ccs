@@ -1,0 +1,17 @@
+push i1 o1 i2 o2
+
+agent Buf1 = i1.'o1.Buf1 + i2.'o2.Buf1
+
+agent Buf2 = i1.Buf21 + i2.Buf22
+agent Buf21 = i1.Buf211 + i2.Buf212 + 'o1.Buf2
+agent Buf22 = i1.Buf221 + i2.Buf222 + 'o2.Buf2
+agent Buf211 = 'o1.Buf21
+agent Buf212 = 'o1.Buf22
+agent Buf221 = 'o2.Buf21
+agent Buf222 = 'o2.Buf22
+
+pop 4
+
+agent BUF2(i1,o1,i2,o2) = (^x,y)(Buf1(i1,x,i2,y) | Buf1(x,o1,y,o2))
+
+weqd (i1,o1,i2,o2) Buf2(i1,o1,i2,o2) BUF2(i1,o1,i2,o2)
