@@ -311,9 +311,13 @@ let rec handle_command = function
       end
   | Pop(n) ->
       begin
-	Format.print_string ("Popping at most "^(string_of_int n)^" variables.");
-	Format.print_newline();
-	Agent_parse.helper#pop n;
+
+	let l = Agent_parse.helper#pop n in
+	  match l with 
+	      [] -> 
+		Format.print_string "Nothing to pop!";Format.print_newline()
+	    | _ -> 
+		Format.print_string "Popping ";pp_list_var 0 l
       end;
   | Implicit ->
       begin

@@ -60,14 +60,17 @@ object(self)
 			  assert(!k = 0);
 		      end) agents
   method pop n =
+    let l = ref [] in
     (try
        for i = 1 to n do
+	 l := (List.hd context)::(!l);
 	 context <- List.tl context;
        done;
      with _ -> ());
     for i = 1 to n do
       self#pop1
     done;
+    List.rev (!l)
   method define (s:string) =
     (* cache la valeur précédente *)
     Hashtbl.add agents s ((ref (List.length context)),ref 0)

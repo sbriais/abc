@@ -13,7 +13,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
-VERSION=1.0.2
+VERSION=1.0.3
 CC=gcc
 CFLAGS=-O2
 CAMLC=ocamlc
@@ -23,8 +23,11 @@ CAMLLIBR=camllibr
 CAMLLEX=ocamllex
 CAMLYACC=ocamlyacc
 CAMLDEP=ocamldep
-COMPFLAGS= -unsafe -w m  -ccopt $(CFLAGS)
-LINKFLAGS=
+CAMLDOC=ocamldoc
+DOT=dot
+COMPFLAGS=   -ccopt $(CFLAGS)
+LINKFLAGS=  
+COMMONFLAGS= 
 LEXFLAGS=
 YACCFLAGS=-v
 CPP=/lib/cpp -P -DVERSION=$(VERSION)
@@ -54,12 +57,14 @@ opt:    depend Makefile
 Makefile: Makefile.am 
 	$(MMAKE) 2> /dev/null
 
+$(PRGM).ps : all $(DISTML) $(DISTMLI)
+	$(CAMLDOC) -dot $(DISTML) $(DISTMLI); $(DOT) -Tps < ocamldoc.out > $(PRGM).ps
 
 $(PRGM).opt : $(CMX) $(CMI) 
-	$(CAMLOPT) $(LINKFLAGS) $(LIBS:.cma=.cmxa) -o $(PRGM).opt $(CMX) -ccopt -O2
+	$(CAMLOPT) $(COMMONFLAGS) $(LINKFLAGS) $(LIBS:.cma=.cmxa) -o $(PRGM).opt $(CMX) -ccopt -O2
 
 $(PRGM) : $(OBJS) $(CMI) 
-	$(CAMLC) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
+	$(CAMLC) $(COMMONFLAGS) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
 
 compile_info.ml: Makefile
 	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
@@ -77,25 +82,25 @@ lexer.ml: lexer.mll
 	
 
 %.cmi : %.mli
-	$(CAMLC) $(COMPFLAGS) -c $<
+	$(CAMLC) $(COMMONFLAGS) $(COMPFLAGS) -c $<
 
 %.cmx : %.ml
-	$(CAMLOPT) $(COMPFLAGS) -c $<
+	$(CAMLOPT) $(COMMONFLAGS) $(COMPFLAGS) -c $<
 
 %.cmo : %.ml
-	$(CAMLC) $(COMPFLAGS) -c $<
+	$(CAMLC) $(COMMONFLAGS) $(COMPFLAGS) -c $<
 
 %.o : %.c
 	$(CC) $(CFLAGS) -I$(CAMLLIBPATH)/caml -c $<
 
 clean:
-	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(SPECML) $(SPECMLI) parser.output compile_info.ml .depend *~
+	rm -f $(CMI) $(CMX) $(CMX:.cmx=.o) $(OBJS) $(PRGM) $(PRGM).opt $(PRGM).ps ocamldoc.out $(SPECML) $(SPECMLI) parser.output compile_info.ml .depend *~
 	touch .depend
 
 depend: .depend
-	@$(CAMLDEP) $(DISTMLI) $(DISTML) $(SPECML) $(SPECMLI) > .depend
+	@$(CAMLDEP) $(COMMONFLAGS) $(DISTMLI) $(DISTML) $(SPECML) $(SPECMLI) > .depend
 
 dist:	
-	tar cvfz $(PRGM)-$(VERSION).tar.gz $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) --exclude compile_info.ml --exclude CVS
+	tar cvfz $(PRGM)-$(VERSION).tar.gz --exclude compile_info.ml $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) 
 
-include .depend
+-include .depend
