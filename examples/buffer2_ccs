@@ -1,7 +1,7 @@
 (* one place buffer *)
 agent Buf1(i1,o1,i2,o2) = i1.'o1.Buf1(i1,o1,i2,o2) + i2.'o2.Buf1(i1,o1,i2,o2)
 
-(* two places buffer *)
+(* two place buffer *)
 (* specification *)
 agent Buf2(i1,o1,i2,o2) = i1.Buf21(i1,o1,i2,o2) + i2.Buf22(i1,o1,i2,o2)
 agent Buf21(i1,o1,i2,o2) = i1.Buf211(i1,o1,i2,o2) + i2.Buf212(i1,o1,i2,o2) + 'o1.Buf2(i1,o1,i2,o2)
@@ -11,6 +11,6 @@ agent Buf212(i1,o1,i2,o2) = 'o1.Buf22(i1,o1,i2,o2)
 agent Buf221(i1,o1,i2,o2) = 'o2.Buf21(i1,o1,i2,o2)
 agent Buf222(i1,o1,i2,o2) = 'o2.Buf22(i1,o1,i2,o2)
 
-(* two places buffer *)
+(* two place buffer *)
 (* implementation *)
 agent BUF2(i1,o1,i2,o2) = (^x,y)(Buf1(i1,x,i2,y) | Buf1(x,o1,y,o2))
