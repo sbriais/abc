@@ -9,11 +9,11 @@
 
 (* we first define three "constructors" *)
 
-agent Z(l) = l(z,sd,d).'z
-agent SD(l,n) = l(z,sd,d).'sd<n>
-agent D(l,n) = l(z,sd,d).'d<n>
+agent Z(l) = l(z,sd,d).'z.Z(l)
+agent SD(l,n) = l(z,sd,d).'sd<n>.SD(l,n)
+agent D(l,n) = l(z,sd,d).'d<n>.D(l,n)
 
-(* Move moves the integer at location l to location m *)
+(* Move: l -> m *)
 agent Move(l,m) = \
 	(^caseZ,caseSD,caseD) \
 		(  'l<caseZ,caseSD,caseD> \
@@ -21,7 +21,7 @@ agent Move(l,m) = \
 		    + caseSD(lp).SD(m,lp) \
 		    + caseD(lp).D(m,lp)))
 
-(* Copy copys the integer at location l to location m and n *)
+(* Copy: l -> m | n *)
 agent Copy(l,m,n) = \
 	(^caseZ,caseSD,caseD) \
 		(  'l<caseZ,caseSD,caseD> \
@@ -32,7 +32,7 @@ agent Copy(l,m,n) = \
 agent Zero(l) = Z(l)
 agent One(l) = (^k)(SD(l,k) | Zero(k))
 
-(* Succ computes the successor of the integer located at l and puts it at m *)
+(* Succ: l+1 -> m *)
 agent Succ(l,m) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
@@ -40,7 +40,7 @@ agent Succ(l,m) = \
                    + caseSD(lp).(^mp)(D(m,mp) | Succ(lp,mp)) \
                    + caseD(lp).SD(m,lp)))
 
-(* Add adds the two integers located at l and m and puts the result at n *)
+(* Add: l+m -> n *)
 agent Add(l,m,n) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
@@ -60,7 +60,7 @@ agent Four(l) = (^k)(D(l,k) | Two(k))
 agent Five(l) = (^k)(SD(l,k) | Two(k))
 agent Six(l) = (^k)(D(l,k) | Three(k))
 
-(* Mult multiplies the two integers located at l and m and puts the result at n *)
+(* Mult: l*m -> n *)
 agent Mult(l,m,n) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
@@ -68,3 +68,77 @@ agent Mult(l,m,n) = \
                    + caseSD(lp).((^m1,m2)(Copy(m,m1,m2) | (^lpm)(Mult(lp,m1,lpm) | Add(lpm,m2,n)))) \
                    + caseD(lp).(^np)(D(n,np) | Mult(lp,m,np))))
 
+(* Double: 2*l -> m *)
+agent Double(l,m) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.Z(m) \
+                   + caseSD(lp).(^l)(D(m,l) | SD(l,lp)) \
+                   + caseD(lp).(^l)(D(m,l) | D(l,lp))))
+
+(* Pred: l-1 -> m *)
+(* if l = 0 then m = 0 *)
+agent Pred(l,m) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.Zero(m) \
+                   + caseSD(lp).Double(lp,m) \
+                   + caseD(lp).(^mp)(SD(m,mp) | Pred(lp,mp))))
+
+(* Sub: l-m -> n *)
+(* if m <= l *)
+agent Sub(l,m,n) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.Zero(n) \
+                   + caseSD(lp).(  'm<caseZ,caseSD,caseD> \
+                                 | (  caseZ.SD(n,lp) \
+                                    + caseSD(mp).(^np)(Double(np,n) | Sub(lp,mp,np)) \
+                                    + caseD(mp).(^np)(SD(n,np) | Sub(lp,mp,np)))) \
+                   + caseD(lp).(   'm<caseZ,caseSD,caseD> \
+                                |  (  caseZ.D(n,lp) \
+                                    + caseSD(mp).(^np)(SD(n,np) | (^lpmp)(Sub(lp,mp,lpmp) | Pred(lpmp,np))) \
+                                    + caseD(mp).(^np)(Double(np,n) | Sub(lp,mp,np)))))) 
+
+(* Equal: l=m  -> 'true *)
+(*        l!=m -> 'false *)
+agent Equal(l,m,true,false) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.(  'm<caseZ,caseSD,caseD> \
+                            | (  caseZ.'true \
+                               + caseSD(mp).'false \
+                               + caseD(mp).'false)) \
+                   + caseSD(lp).(  'm<caseZ,caseSD,caseD> \
+                                 | (  caseZ.'false \
+                                    + caseSD(mp).Equal(lp,mp,true,false) \
+                                    + caseD(mp).'false)) \
+                   + caseD(lp).(  'm<caseZ,caseSD,caseD> \
+                                | (  caseZ.'false \
+                                   + caseSD(mp).'false \
+                                   + caseD(mp).Equal(lp,mp,true,false)))))
+
+(* Lt: l<m  -> 'true *)
+(*     l>=m -> 'false *)
+agent Lt(l,m,true,false) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.(  'm<caseZ,caseSD,caseD> \
+                            | (  caseZ.'false \
+                               + caseSD(mp).'true \
+                               + caseD(mp).'true)) \
+                   + caseSD(lp).(  'm<caseZ,caseSD,caseD> \
+                                 | (  caseZ.'false \
+                                    + caseSD(mp).Lt(lp,mp,true,false) \
+                                    + caseD(mp).(^l,m,pm)(Double(lp,l) | D(m,mp) | Pred(m,pm) | Lt(l,pm,true,false)))) \
+                   + caseD(lp).(  'm<caseZ,caseSD,caseD> \
+                                | (  caseZ.'false \
+                                   + caseSD(mp).(^l,m,pl)(D(l,lp) | Pred(l,pl) | Double(mp,m) | Lt(pl,m,true,false)) \
+                                   + caseD(mp).Lt(lp,mp,true,false)))))
+
+
+agent Ten(l) = (^k)(D(l,k) | Five(k))
+agent Twenty(l) = (^k)(D(l,k) | Ten(k))
+agent Fourty(l) = (^k)(D(l,k) | Twenty(k))
+
+agent QD(l) = (^k)(D(l,k) | (^k1)(SD(k,k1) | Ten(k1)))

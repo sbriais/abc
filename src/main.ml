@@ -398,10 +398,23 @@ let welcome () =
   !Formatter.format#print_string "Welcome to Another Bisimulation Checker";
   !Formatter.format#print_newline()
 
+let args l = 
+  ["--cache",Arg.Float(fun x -> let y = int_of_float (100. *. x) in l := !l@[Maxrate(100);Rate(y)]),"Sets the caching rate";
+   "--help",Arg.Unit(fun () -> l := !l@[Help]),"Display the help";
+   "-help",Arg.Unit(fun () -> l := !l@[Help]),"Display the help"]
+
+let read_args () = 
+  let l = ref [] in
+    Arg.parse (args l) (fun s -> l := !l@[Load(s)]) "usage: abc [--cache x] [filenames]*";
+    !l
+
 let _ =
   welcome ();
+  let first = ref true in
   let rec loop () = 
     (try
+       if !first then handle_command (List(read_args ()));
+       first := false;
        !Formatter.format#print_string "abc > ";!Formatter.format#print_flush ();
        let com = parse_command lexer_stdin in
 	 handle_command com;
