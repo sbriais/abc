@@ -1,0 +1,8 @@
+INIT(abc)
+VERSION(1.0.0)
+SOURCES(agent.ml agent_parse.ml conditions.mli conditions.ml distinctions.mli distinctions.ml main.ml multiset.mli multiset.ml name.mli name.ml commands.ml pprinter.ml parser.ml)
+EXTRA(README)
+USE_LEXER()
+dnl USE_PARSER()
+LIBRARIES(unix.cma)
+dnl USE_NUMS()

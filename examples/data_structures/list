@@ -1,0 +1,13 @@
+(* Applications of the pi-calculus *)
+(* lists *)
+
+clear Nil Cons Node ListCases
+
+push k
+agent Nil = k(n,c).'n
+agent Cons(head,tail) = (^v,l)(Node(v,l) | 'head<v> | 'tail<l>)
+agent Node(v,l) = k(n,c).'c<v,l>
+pop
+push p f
+agent ListCases(k) = (^n,c)'k<n,c>.(n.'p + c(v,l).'f<v,l>)
+pop 2

@@ -1,0 +1,24 @@
+(* Specification *)
+push get release
+clear LockSpec NonAvailable
+
+agent LockSpec = get.NonAvailable + release.LockSpec
+agent NonAvailable = release.LockSpec
+
+pop 2
+
+(* Implementation *)
+push get release available
+clear Get Release
+
+agent Get = get.available.Get
+agent Release = release.available.('available | Release)
+
+pop
+
+agent LockImpl = (^available) \
+		 	( 'available | Get(available) | Release(available))
+
+pop 2
+
+					     

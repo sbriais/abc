@@ -1,0 +1,10 @@
+%{
+%}
+%token DUMMY
+%start dummy
+%type <unit> dummy
+%%
+
+dummy:
+/* */ { () }
+;

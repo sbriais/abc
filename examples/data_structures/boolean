@@ -1,0 +1,13 @@
+(* Applications of the pi-calculus *)
+(* booleans *)
+
+clear True False Cond
+
+push l
+agent True = l(tt,ff).'tt
+agent False = l(tt,ff).'ff
+pop
+push p q
+agent Cond(l) = (^tt,ff)'l<tt,ff>.(tt.'p + ff.'q)
+pop 2
+

@@ -1,0 +1,3 @@
+agent A = (\x,y)(x.0 | 'y.0)
+agent B(x,y) = (x.'y.0 + 'y.x.0)
+agent C(x,y) = (B x y + [x=y]t.0)

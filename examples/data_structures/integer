@@ -1,0 +1,63 @@
+(* Applications of the pi-calculus *)
+(* integer *)
+
+reset
+
+agent Zero(l) = l(z,s).'z
+agent Succ(l,n) = (^k)(l(z,s).'s<k> | 'n<k>)
+agent IntMatch(l,caseZero,caseSucc) = 'l<caseZero,caseSucc>
+
+agent Un(l) = (^k)(l(z,s).'s<k> | Zero(k))
+
+agent Move(l,m,done) = \
+	(^caseZero,caseSucc)( \
+		  IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.('done | Zero(m)) \
+		   + caseSucc(lp).('done | m(z,s).'s<lp>)))
+
+agent Add(l,m,n,done) = \
+	(^caseZero,caseSucc)( \
+		  IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.Move(m,n,done) \
+		   + caseSucc(lp).((^add)(Succ(n,add) | add(kp).Add(lp,m,kp,done)))))
+
+agent Deux(l) = (^k)(l(z,s).'s<k> | Un(k))
+agent Trois(l) = (^k)(l(z,s).'s<k> | Deux(k))
+agent Quatre(l) = (^k)(l(z,s).'s<k> | Trois(k))
+agent Cinq(l) = (^k)(l(z,s).'s<k> | Quatre(k))
+agent Six(l) = (^k)(l(z,s).'s<k> | Cinq(k))
+
+agent Pred(l,m,done) = \
+	(^caseZero,caseSucc)( \
+		  IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.('done | Zero(m)) \
+		   + caseSucc(lp).Move(lp,m,done)))
+		
+
+agent Copy(l,m,done) = \
+      (^caseZero,caseSucc)( \
+		  IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.(Zero(l) | Zero(m) | 'done) \
+		   + caseSucc(lp).((^add)(Succ(m,add) | add(mp).(l(z,s).'s<lp> | Copy(lp,mp,done))))))
+
+agent True(l) = l(tt,ff).'tt
+agent False(l) = l(tt,ff).'ff
+
+agent Le(l,m,k) = \
+      (^caseZero,caseSucc)( \
+		  IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.True(k) \
+                   + caseSucc(lp).(  IntMatch(m,caseZero,caseSucc) \
+			           | (  caseZero.False(k) \
+                                      + caseSucc(mp).Le(lp,mp,k)))))
+
+agent For(l,a,endfor) = \
+	(^caseZero,caseSucc,done,m,cont)( \
+		  Copy(l,m,done) \     
+		| done.IntMatch(l,caseZero,caseSucc) \
+		| (  caseZero.'endfor \
+		   + caseSucc(lp).('a<m,cont> | cont.For(lp,a,endfor))))
+
+agent Somme(a,l) = a(m,cont).((^done)(Add(l,m,l,done) | done.'cont.Somme(a,l)))
+
+weq (^a,k,l,done)(For(k,a,done) | Un(k) | Zero(l) | Somme(a,l) | done.Copy(l,m,done)) Un(m)

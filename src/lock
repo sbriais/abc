@@ -1,0 +1,31 @@
+(* Specification *)
+push get release
+clear LockSpec NonAvailable
+
+agent LockSpec = get.NonAvailable + release.LockSpec
+agent NonAvailable = release.LockSpec
+
+pop 2
+
+(* Implementation *)
+push get release available nonAvailable
+clear Get Release LockImpl
+
+agent Get = get.available.'nonAvailable.Get
+agent Release = release.(available.('available | Release) + \
+			 nonAvailable.('available | Release))
+
+pop 2
+agent LockImpl = (^ available, nonAvailable) \
+			(Get(available,nonAvailable) | \
+                         Release(available,nonAvailable) | \
+                         'available)
+pop 2
+
+(*
+agent LockSpec(g,r) = g.NonAv(g,r) + r.LockSpec(g,r);
+agent NonAv(g,r) = r.LockSpec(g,r);
+agent Get(g,r,a,na) = g.a.'na.Get(g,r,a,na);
+agent Release(g,r,a,na) = r.(a.('a.0 | Release(g,r,a,na)) + na.('a.0 | Release(g,r,a,na)));
+agent LockImpl(g,r) = (Get(g,r,a,na) | Release(g,r,a,na) | 'a.0) \ {a,na};
+*)

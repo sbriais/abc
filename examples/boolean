@@ -1,0 +1,12 @@
+(* les booléens True et False situé en l *) /
+agent True(l) = l(tt,ff).'tt.0
+agent False(l) = l(tt,ff).'ff.0
+(* la conditionnelle *) /
+agent Cond(p,q,l) = (^tt,ff)'l<tt,ff>.(tt.'p.0 + ff.'q.0)
+(* le test *) /
+agent Test_true(p,q) = (^l)(Cond p q l  | True l) 
+weq Test_true p q 'p.0
+y
+agent Test_false(p,q) = (^l)(Cond p q l  | False l) 
+weq Test_false p q 'q.0
+y

@@ -1,0 +1,11 @@
+push a b c d e f g h i
+agent P1 = K2(c,e) + [a=e]'c<b>.a(d).K1(a,b,d)
+agent P2 = 'c<b>.e(d).K2(b,d)
+agent P3 = (K2(c,e) + [a=e]'c<b>.a(d).K1(a,b,d)) | 'a<b>.'c<d>
+agent P4 = 'c<b>.e(d).K2(b,d) | 'a<b>.'c<d>
+agent P5 = 'a<c>.e(f) | 'a<b>.c(d) | a(b).'c<b>
+agent P6 = 'a<g>.c(f) | 'a<i>.c(h) | 'a<c>.e(f) | 'a<b>.c(d)
+agent P7 = 'a<g>.c(f) | 'a<i>.c(h) | 'a<b>.c(d) | 'a<b>.c(d) | a(b).'c<d>
+pop 9
+agent K1(a,b,c,d,e,f,g,h,i) = (\a,c,e)P1(a,b,c,d,e,f,g,h,i)
+agent K2(a,b,c,d,e,f,g,h,i) = (\c,e)P2(a,b,c,d,e,f,g,h,i)

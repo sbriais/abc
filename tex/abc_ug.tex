@@ -1,0 +1,514 @@
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage{process}
+
+\newcommand{\LAMBDA}[2]{(\lambda {#1}){#2}}
+
+\newenvironment{bnf}{%
+  \newif\ifbnftab%
+  \bnftabfalse%
+  \let\bnfnewline\\%
+  \def\IS{%
+    &$::=$&%
+    \bnftabtrue}
+  \def\OR{%
+    \ifbnftab%
+      \vrule~%
+    \else%
+      \expandafter\bnfORline%
+    \fi%
+    \bnftabtrue}%
+  \def\bnfORline{&\hfill\vrule&}%
+  \def\\{%
+    \bnfnewline%
+    \bnftabfalse}%
+  \def\BRK{\cr&&}%
+  \sffamily%
+  \par\medskip
+  \begin{tabular}{rcll}}{%
+  \end{tabular}%
+  \par\medskip}
+
+
+\author{\textsc{Sébastien BRIAIS}}
+\title{The ABC User's Guide}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  We describe in this document how to use our tool called Another
+  Bisimilarity Checker (ABC). The ABC is a tool that checks open
+  equivalence between terms of \picalculus.
+\end{abstract}
+
+\section{Input syntax: \picalculus terms}
+\subsection{The \picalculus}
+We assume a countably infinite set of names denoted by
+$a,b,x,v,\ldots$ and a disjoint set of agent identifiers denoted by
+$X$. The syntax of \picalculus terms is described by the following grammar:
+\begin{bnf}
+$P,Q$ \IS $\NIL$ 
+      \OR $\PAR{P}{Q}$ 
+      \OR $\SUM{P}{Q}$ 
+      \OR $\PREFIX{\alpha}{P}$
+      \OR $\NU{\TUPLE{x}}{P}$
+      \OR $\APPLY{X}{\TUPLE{v}}$
+      \OR $\MATCH{a}{b}{P}$\\
+
+$\alpha$ \IS $\INPUT{a}{\TUPLE{x}}$ 
+         \OR $\OUTPUT{}{a}{\TUPLE{v}}$ 
+         \OR $\TAU$
+\end{bnf}
+As usual, we write $\TUPLE{v}$ as a shortcut for $v_1,\ldots,v_n$ for some $n$.
+
+Sometimes, \picalculus syntax is presented in terms of concretions and
+abstractions. A concretion is mainly something like $\CONC{\TUPLE{v}}{C}$
+where $C$ is a process or a concretion. An abstraction is mainly
+something like $\LAMBDA{\TUPLE{x}}{A}$ where $A$ is a process or an
+abstraction. In this setting, prefixes are either $\TAU$, an input
+name $\INPUT{a}{}$ or an output name $\OUTPUT{}{a}{}$. The presentation
+in terms of concretions and abstractions make the labelled-transition
+semantics easier to write.
+It is easy to convert classic syntax to this one. Indeed, we have
+$$
+\begin{array}{rcl}
+\PREFIX{\INPUT{a}{\TUPLE{x}}}{P} & \equiv & \PREFIX{\INPUT{a}{}}{\LAMBDA{\TUPLE{x}}{P}} \\
+\PREFIX{\OUTPUT{}{a}{\TUPLE{v}}}{P} & \equiv & \PREFIX{\OUTPUT{}{a}{}}{\CONC{\TUPLE{v}}{P}}
+\end{array}
+$$
+
+The \picalculus terms accepted by the ABC are the one described by the
+previous grammar. It also allows the user to enter a \picalculus
+term written in terms of abstractions and concretions.
+
+
+The ABC also allows to enter a term partially applied to a variable. This makes sense
+only if the term is an abstraction.
+\subsection{Input syntax}
+\begin{tabular}{cc}
+\begin{bnf}
+agent \IS factor\\
+      \OR factor \verb:"+": agent\\
+\\
+factor \IS term \\
+       \OR term \verb:"|": factor\\
+\\
+term \IS \verb:"0": \\
+      \OR ident params \\
+      \OR prefix \verb:".": term \\
+      \OR \verb:"[": vars \verb:"]": term \\
+      \OR \verb:"[": var \verb:"=": var \verb:"]": term \\
+      \OR \verb:"(": \verb:"\": vars \verb:")": term \\
+      \OR \verb:"(": \verb:"^": vars \verb:")": term \\
+      \OR term var \\
+      \OR \verb:"(": agent \verb:"):\\
+\end{bnf}
+&
+\begin{bnf}
+vars \IS var \\
+     \OR var \verb:",": vars \\
+\\
+prefix \IS \verb:"t": \\
+       \OR var params \\
+       \OR \verb:"'": var oparams \\
+\\
+params \IS $\epsilon$ \\
+       \OR \verb:"(": vars \verb:")": \\
+\\
+oparams \IS $\epsilon$ \\
+       \OR \verb:"<": vars \verb:">": \\
+\\
+var \IS [a-z][a-zA-Z\_/.0-9]* \\
+\\
+ident \IS [A-Z][a-zA-Z\_/.0-9]* \\
+\end{bnf}
+\end{tabular}
+
+\paragraph{Remark:} Actually, it is optional to write the nil process after an action.
+
+\section{Commands of the ABC}
+\subsection{Agent definition}
+\label{ss:agentdef}
+\paragraph{Syntax}\mbox{}\\
+\textbf{agent} {\sffamily ident params = agent}
+
+
+Note that only \emph{closed agents}\footnote{for efficiency reasons, see also subsection \ref{ss:context}} are allowed (i.e. $\mathrm{fn}$({\sffamily agent}) $\subset${\sffamily params}).
+
+\subsection{Checking (open) equivalence}
+\subsubsection{Strong equivalence}
+\paragraph{Syntax}\mbox{}\\
+\textbf{eq} {\sffamily agent1 agent2}\\
+\textbf{eqd} {\sffamily (vars) agent1 agent2}
+
+
+The command \textbf{eq} checks strong equivalence between {\sffamily agent1} and {\sffamily agent2}. The command \textbf{eqd} takes into account the distinction such that each variable in {\sffamily vars} is distinct from all other free names in {\sffamily agent1} and {\sffamily agent2}.
+
+\subsubsection{Weak equivalence}
+\paragraph{Syntax}\mbox{}\\
+\textbf{weq} {\sffamily agent1 agent2}\\
+\textbf{weqd} {\sffamily (vars) agent1 agent2}
+
+
+Similar to strong equivalence.
+
+\subsection{Viewing agents}
+\paragraph{Syntax}\mbox{}\\
+\textbf{print} {\sffamily agent}\\
+\textbf{show} {\sffamily agent}
+
+
+The command \textbf{print} pretty-prints the given {\sffamily agent} whereas the command \textbf{show} pretty-prints the standard form of the given {\sffamily agent}.
+
+\subsection{Exploring the behaviour of an agent}
+\paragraph{Syntax}\mbox{}\\
+\textbf{step} {\sffamily agent}
+
+
+The command \textbf{step} enters in an interactive mode in which it is possible to view and simulate the (strong) commitments of the given {\sffamily agent}.
+
+\subsection{Setting memory usage}
+\paragraph{Syntax}\mbox{}\\
+\textbf{scale} integer\\
+\textbf{value} integer
+
+The command \textbf{scale} fixes the scale for setting the memory usage. The command \textbf{value} sets the memory usage to $\frac{\textbf{value}}{\textbf{scale}}$. This rational number represents the frequency for caching computed data.
+
+\subsection{Implicit context}
+\label{ss:context}
+We found annoying to not allow open terms in agent definition (as
+mentioned in subsection \ref{ss:agentdef}). So, we added the notion of
+semi-explicit context that we call implicit context. The idea is that
+a context is a list of variables that are implicit in agent definition
+and agent application. More formally, there is a \emph{current
+  implicit context}, and each agent has an \emph{agent implicit
+  context}. If an agent is not defined, then its implicit context is
+the current one.  So, when an agent is defined, its context is the
+current one. It is possible to push or pop variables in the current
+implicit context.  When one pops variables out of the current context,
+these variables are also popped out of all the agent implicit
+contexts.
+\paragraph{Syntax}\mbox{}\\
+\textbf{push} {\sffamily var$_1$ ... var$_n$}
+
+This command pushes {\sffamily var$_1$ ... var$_n$} into the
+current context.
+
+\mbox{}\\
+\textbf{pop} [$n$]
+
+This command pops $n$ variables out of the current context ($n$ is a
+positive integer, if $n$ is not specified, then $1$ is the value by
+default).
+
+\mbox{}\\
+\textbf{implicit}
+
+This command shows the current implicit context.
+
+\mbox{}\\
+\textbf{clear} {\sffamily ident$_1$ ... ident$_n$}
+
+This command undefines the agent {\sffamily ident$_1$ ... ident$_n$}
+if they were defined.
+
+
+\subsection{Other commands}
+\subsubsection{Help}
+\paragraph{Syntax}\mbox{}\\
+\textbf{help}
+
+The command \textbf{help} give the user some help.
+
+\subsubsection{Resetting the ABC}
+\paragraph{Syntax}\mbox{}\\
+\textbf{reset}
+
+This command clears all the memory of the ABC.
+
+\subsubsection{Loading a file}
+\paragraph{Syntax}\mbox{}\\
+\textbf{load} {\sffamily filename}
+
+This command loads the given file in the ABC.
+
+{\sffamily filename} $\in$ {\sffamily var}$\cup${\sffamily ident}.
+
+\subsubsection{Exiting}
+\paragraph{Syntax}\mbox{}\\
+\textbf{exit}
+
+\textbf{exit} makes you exit the ABC.
+
+
+\section{Examples}
+\subsection{A beginner's example}
+Let us start the ABC.
+\begin{verbatim}
+bash-2.05b$ ./abc.opt
+Welcome to Another Bisimulation Checker
+\end{verbatim}
+Let us define agents $\FUN{A}$ and $\FUN{B}$ with 
+$$
+\begin{array}{rcl}
+\APPLY{A}{x,y} & \EQDEF & \PAR{\PREFIX{\INPUT{x}{}}{\NIL}}{\PREFIX{\OUTPUT{}{y}{}}{\NIL}} \\
+\APPLY{B}{x,y} & \EQDEF & \SUM{\PREFIX{\INPUT{x}{}}{\PREFIX{\OUTPUT{}{y}{}}{\NIL}}}{\PREFIX{\OUTPUT{}{y}{}}{\PREFIX{\INPUT{x}{}}{\NIL}}}
+\end{array}
+$$
+\begin{verbatim}
+abc > agent A(x,y) = x.0 | 'y.0
+Agent A is defined.
+abc > agent B(x,y) = x.'y.0 + 'y.x.0
+Agent B is defined.
+\end{verbatim}
+It is well known that $\APPLY{A}{x,y} \not\sim^{\mathrm{o}}_{\EMPTY} \APPLY{B}{x,y}$\footnote{$\sim^{\mathrm{o}}_D$ is the open bisimilarity with the set of distinctions $D$.}.
+\begin{verbatim}
+abc > eq A(x,y) B(x,y)
+The two agents are not strongly related (2).
+Do you want to see a trace of execution (yes/no) ? yes
+trace of A x y
+ -t-> 0
+trace of B x y
+ 
+
+\end{verbatim}
+Indeed, $\APPLY{A}{x,y}$ can perform a $\TAU$ commitment that $\APPLY{B}{x,y}$ can't (as shown in the trace).
+\begin{verbatim}
+abc > step A(x,y)
+1: { x=y }  =>  A x y --t-> 0
+
+2: {  }  =>  A x y --x-> 'y.0
+
+3: {  }  =>  A x y --'y-> x.0
+
+Please choose a commitment (between 1 and 3) or 0 to exit: 1
+no more commitments
+abc > step B(x,y)
+1: {  }  =>  B x y --x-> 'y.0
+
+2: {  }  =>  B x y --'y-> x.0
+
+Please choose a commitment (between 1 and 2) or 0 to exit: 1
+1: {  }  =>  'y.0 --'y-> 0
+
+Please choose a commitment (between 1 and 1) or 0 to exit: 1
+no more commitments
+\end{verbatim}
+
+\paragraph{Remark:}
+We see above that the commitments are shown numbered. Each commitment has the form: 
+\begin{verbatim}
+a set of conditions => agent --action--> agent
+\end{verbatim}
+The set of conditions is the one that should be satisfied in order for
+the commitment to take place.
+
+\bigskip
+
+Thus, it is easy to see that $\APPLY{A}{x,y} \sim^{\mathrm{o}}_{\SET{x \not= y}} \APPLY{B}{x,y}$.
+\begin{verbatim}
+abc > eqd (x,y) A(x,y) B(x,y)
+The two agents are strongly related (3).
+Do you want to see the core of the bisimulation (yes/no) ? yes
+{
+  (
+    x.0
+    {
+      (x, y)
+    }
+    x.0
+  )
+
+  (
+    'y.0
+    {
+      (x, y)
+    }
+    'y.0
+  )
+
+  (
+    ('y.x.0 + x.'y.0)
+    {
+      (x, y)
+    }
+    ('y.0 | x.0)
+  )
+}
+\end{verbatim}
+
+\paragraph{Remark:}
+What we call the \emph{core} of a bisimulation is a ternary relation
+between an agent, a set of distinctions and an other agent such that
+its symmetric closure plus the identity relation is a bisimulation.
+
+\bigskip
+
+Moreover, if we define an agent $\FUN{C}$ such that
+$$
+\begin{array}{rcl}
+\APPLY{C}{x,y} & \EQDEF & \SUM{\APPLY{B}{x,y}}{\MATCH{x}{y}{\PREFIX{\TAU}{\NIL}}}
+\end{array}
+$$
+\begin{verbatim}
+abc > agent C(x,y) = B(x,y) + [x=y]t.0
+Agent C is defined.
+\end{verbatim}
+We have $\APPLY{A}{x,y} \sim^{\mathrm{o}}_{\EMPTY} \APPLY{C}{x,y}$.
+\begin{verbatim}
+abc > eq A(x,y) C(x,y)
+The two agents are strongly related (4).
+Do you want to see the core of the bisimulation (yes/no) ? yes
+{
+  (
+    0
+    { }
+    0
+  )
+
+  (
+    x.0
+    { }
+    x.0
+  )
+
+  (
+    'y.0
+    { }
+    'y.0
+  )
+
+  (
+    ([x=y]t.0 + 'y.x.0 + x.'y.0)
+    { }
+    ('y.0 | x.0)
+  )
+}
+\end{verbatim}
+End of this example.
+\begin{verbatim}
+abc > exit
+bash-2.05b$
+\end{verbatim}
+
+\subsection{Usage of the implicit context}
+\subsubsection{Basic example}
+At the beginning, the current implicit context is empty.
+\begin{verbatim}
+bash-2.05b$ ./abc
+Welcome to Another Bisimulation Checker
+abc > implicit
+No implicit variables.
+\end{verbatim}
+
+Assume that we want to define an agent $\APPLY{A}{x} \EQDEF
+\SUM{\PREFIX{\INPUT{x}{}}{\NIL}}{\PREFIX{\TAU}{\APPLY{A}{x}}}$, but with using the concept of implicit
+context. 
+
+
+We first push $x$ into the current context.
+\begin{verbatim}
+abc > push x
+Pushing x
+abc > implicit
+Implicit variables are x
+\end{verbatim}
+
+We then define our agent $A$.
+\begin{verbatim}
+abc > agent A = x.0 + t.A
+Agent A is defined.
+\end{verbatim}
+
+Let us see what is the standard form of $A$.
+\begin{verbatim}
+abc > show A
+( x. 0 +  t. A x )
+\end{verbatim}
+Note that when we write $A$, it really means $A\ x$, since the implicit
+context of $A$ is $x$.
+
+
+Now, we push another name $y$, see the standard form of $A$ and then
+we pop the two names we had pushed and see again the standard form of
+$A$.
+\begin{verbatim}
+abc > push y
+Pushing y
+abc > implicit
+Implicit variables are x y
+abc > show A
+( x. 0 +  t. A x )
+abc > pop 2
+Popping at most 2 variables.
+abc > implicit
+No implicit variables.
+abc > show A
+(\x0) ( x0. 0 +  t. A x0 )
+abc > exit
+bash-2.05b$
+\end{verbatim}
+
+\subsubsection{Advanced example}
+One difficulty that appears with the concept of implicit context is
+the behavior when there is mutually recursive agent definitions.
+
+
+In the following, we define two mutually recursive agents $A$ and $B$,
+with $\APPLY{A}{x} = \PREFIX{\INPUT{x}{y}}{\APPLY{B}{x,y}}$ and
+$\APPLY{B}{x,y} = \PREFIX{\OUTPUT{}{x}{}}{\APPLY{A}{x}}$.
+\begin{verbatim}
+bash-2.05b$ ./abc
+Welcome to Another Bisimulation Checker
+abc > push x
+Pushing x
+abc > agent A = x(y).B y
+Agent A is defined.
+abc > show A
+x(x0). B x x0
+abc > push y
+Pushing y
+abc > agent B = 'x.A
+Agent B is defined.
+abc > show B
+'x. A x
+abc > pop
+Popping at most 1 variables.
+abc > implicit
+Implicit variables are x
+abc > show A
+x(x0). B x x0
+abc > show B
+(\x0) 'x. A x
+abc > show A
+(\x0) x0(x1). B x0 x1
+abc > show B
+(\x0, x1) 'x0. A x0
+\end{verbatim}
+
+Now, we redo the same actions, to illustrate the use of \textbf{clear}.
+\begin{verbatim}
+abc > push x
+Pushing x
+abc > agent A = x(y).B y
+Agent A is defined.
+abc > show A
+x(x0). B x0
+\end{verbatim}
+
+We see here that the behaviour is not the one we want. Indeed, now $x$
+is not an implicit parameter of $B$ since $B$ is already defined and
+the implicit context of $B$ is now empty. So, we have to clear the
+definition of $B$ before redoing the same commands.
+\begin{verbatim}
+abc > clear B
+Clearing B
+abc > agent A = x(y).B y
+Agent A is defined.
+abc > show A
+x(x0). B x x0
+\end{verbatim}
+
+And then, we can continue as before.
+\end{document}

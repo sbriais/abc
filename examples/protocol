@@ -1,0 +1,57 @@
+value 100
+(*
+   l'implémentation 
+*) \ 
+agent CC(fa,fp,l,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = (in(v). \
+'fa<data>.'fa<v>.CC fa fp l data in out ho_cmd ho_acc ch_rel ho_com ho_fail + \
+l(mnew).'fa<ho_cmd>.'fa<mnew>.(fp(c).[c=ho_com]'fa<ch_rel>.fa(mold).'l<mold>.CC \
+fp fa l data in out ho_cmd ho_acc ch_rel ho_com ho_fail + \
+fa(c).[c=ho_fail]'l<mnew>.CC fa fp l data in out ho_cmd ho_acc ch_rel \
+ho_com ho_fail))
+agent HC(l,m,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = \
+'l<m>.l(m).HC l m data in out ho_cmd ho_acc ch_rel ho_com ho_fail 
+agent MSC(fa,fp,m,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = \
+(^l)(HC l m data in out ho_cmd ho_acc ch_rel ho_com ho_fail | CC fa fp \
+l data in out ho_cmd ho_acc ch_rel ho_com ho_fail) 
+agent BSa(f,m,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = \
+f(c).([c=data]f(v).'m<data>.'m<v>.BSa f m data in out ho_cmd ho_acc \
+ch_rel ho_com ho_fail + \
+[c=ho_cmd]f(v).'m<ho_cmd>.'m<v>.(f(c).[c=ch_rel]'f<m>.BSp f m data in \
+out ho_cmd ho_acc ch_rel ho_com ho_fail + \
+m(c).[c=ho_fail]'f<ho_fail>.BSa f m data in out ho_cmd ho_acc ch_rel \
+ho_com ho_fail)) 
+agent BSp(f,m,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = \
+m(c).[c=ho_acc]'f<ho_com>.BSa f m data in out ho_cmd ho_acc ch_rel \
+ho_com ho_fail 
+agent MS(m,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = \
+m(c).([c=data]m(v).'out<v>.MS m data in out ho_cmd ho_acc ch_rel \
+ho_com ho_fail + [c=ho_cmd]m(mnew).('mnew<ho_acc>.MS mnew data in \
+out ho_cmd ho_acc ch_rel ho_com ho_fail + 'm<ho_fail>.MS m data in out \
+ho_cmd ho_acc ch_rel ho_com ho_fail)) 
+agent P(fa,fp,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = (^m)(MSC fa \
+fp m data in out ho_cmd ho_acc ch_rel ho_com ho_fail | BSp fp m data \
+in out ho_cmd ho_acc ch_rel ho_com ho_fail) 
+agent Q(fa,data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = (^m)(BSa fa m \
+data in out ho_cmd ho_acc ch_rel ho_com ho_fail | MS m data in out \
+ho_cmd ho_acc ch_rel ho_com ho_fail) 
+agent System(data,in,out,ho_cmd,ho_acc,ch_rel,ho_com,ho_fail) = (^fa,fp)(P \
+fa fp data in out ho_cmd ho_acc ch_rel ho_com ho_fail | Q fa data in \
+out ho_cmd ho_acc ch_rel ho_com ho_fail) 
+(*
+   la spécification
+*) \
+agent Spec(in,out) = (in(v).S1 v in out + t.Spec in out)
+agent S1(v1,in,out) = (in(v).S2 v1 v in out + 'out<v1>.Spec in out + t.'out<v1>.Spec in out)
+agent S2(v1,v2,in,out) = (in(v).S3 v1 v2 v in out + 'out<v1>.S1 v2 in out + \
+t.'out<v1>.'out<v2>.Spec in out)
+agent S3(v1,v2,v3,in,out) = 'out<v1>.S2 v2 v3 in out
+(*
+   on vérifie la weak bisimulation
+*) \
+agent Sys(in,out) = (^ho_acc,ho_com,data,ho_cmd,ch_rel,ho_fail)System data in out ho_cmd ho_acc ch_rel ho_com ho_fail 
+(*
+show System
+show Spec 
+*) \
+(* weqd (in,out,ho_acc,ho_com,data,ho_cmd,ho_acc,ch_rel,ho_fail) Spec in out System data in out ho_cmd ho_acc ch_rel ho_com ho_fail *) \
+weqd (in,out) Spec in out Sys in out
