@@ -71,7 +71,7 @@ let see_bisim bisim =
 let see_trace a b =
   let choix = ref None in
     while (!choix) = None do
-      Format.print_string "Do you want to see a trace of execution (yes/no) ? ";
+      Format.print_string "Do you want to see a trace that leads to distinguish the two processes (yes/no) ? ";
       Format.print_flush (); 
       (try
 	 choix := Some(parse_yes_no lexer_stdin)
