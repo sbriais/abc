@@ -65,10 +65,10 @@ let rec step_agent org comp_org comp_comm comms =
 	    else ()
 	end
 
-let see_bisim bisim =
+let see_bisim flag bisim =
   let choix = ref None in
     while (!choix) = None do
-      Format.print_string "Do you want to see the core of the bisimulation (yes/no) ? ";
+      Format.print_string ("Do you want to see the core of the "^(if flag then "bi" else "")^"simulation (yes/no) ? ");
       Format.print_flush (); 
       (try
 	 choix := Some(parse_yes_no lexer_stdin)
@@ -183,7 +183,7 @@ let rec handle_command = function
 	     | n -> 
 		 Format.print_string ("The two agents are strongly related ("^(string_of_int n)^").");
 		 Format.print_newline();
-		 see_bisim bisim
+		 see_bisim true bisim
 	  );
       end
   | Weqd(l,a,b) ->
@@ -200,7 +200,41 @@ let rec handle_command = function
 	     | n -> 
 		 Format.print_string ("The two agents are weakly related ("^(string_of_int n)^").");
 		 Format.print_newline();
-		 see_bisim bisim
+		 see_bisim true bisim
+	  );
+      end
+  | Ltd(l,a,b) ->
+      begin
+	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
+	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
+	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Agent.lt env a b d in
+	  (match n with
+	       0 -> 
+		 Format.print_string ("The two agents are not strongly related ("^(string_of_int (List.length ta))^").");
+		 Format.print_newline();
+		 see_trace a b ta tb "-"
+	     | n -> 
+		 Format.print_string ("The two agents are strongly related ("^(string_of_int n)^").");
+		 Format.print_newline();
+		 see_bisim false bisim
+	  );
+      end
+  | Wltd(l,a,b) ->
+      begin
+	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
+	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
+	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Agent.wlt env a b d in
+	  (match n with
+	       0 -> 
+		 Format.print_string ("The two agents are not weakly related ("^(string_of_int (List.length ta))^").");
+		 Format.print_newline();
+		 see_trace a b ta tb "="
+	     | n -> 
+		 Format.print_string ("The two agents are weakly related ("^(string_of_int n)^").");
+		 Format.print_newline();
+		 see_bisim false bisim
 	  );
       end
   | Show(a) -> 

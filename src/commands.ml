@@ -30,6 +30,8 @@ type command =
   | Def of string * Agent.agent
   | Eqd of Name.t list * Agent.agent * Agent.agent
   | Weqd of Name.t list * Agent.agent * Agent.agent
+  | Ltd of Name.t list * Agent.agent * Agent.agent
+  | Wltd of Name.t list * Agent.agent * Agent.agent
   | Push of (Name.t list)
   | Pop of int
   | Clear of (string list)

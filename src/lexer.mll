@@ -43,10 +43,14 @@
     | AGENT
     | EQ
     | WEQ
+    | LT
+    | WLT
     | EXIT
     | SHOW
     | EQD
     | WEQD
+    | LTD
+    | WLTD
     | PRINT
     | RESET
     | STEP
@@ -74,6 +78,8 @@
 	"show",SHOW;
 	"eqd", EQD;
 	"weqd", WEQD;
+	"lt",LT;
+	"wlt",WLT;
 	"reset", RESET;
 	"print", PRINT;
 	"step", STEP;

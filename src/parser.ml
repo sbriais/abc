@@ -420,6 +420,28 @@ let rec command lexer =
 	let a2 = agent lexer in
 	  parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
 	  Commands.Weqd(d,a1,a2)
+    | LT ->
+	let a1 = agent lexer in
+	let a2 = agent lexer in
+	  parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
+	  Commands.Ltd([],a1,a2)
+    | LTD ->
+	let d = params lexer in
+	let a1 = agent lexer in
+	let a2 = agent lexer in
+	  parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
+	  Commands.Ltd(d,a1,a2)
+    | WLT ->
+	let a1 = agent lexer in
+	let a2 = agent lexer in
+	  parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
+	  Commands.Wltd([],a1,a2)
+    | WLTD ->
+	let d = params lexer in
+	let a1 = agent lexer in
+	let a2 = agent lexer in
+	  parse_token EOL lexer (function () -> parse_error lexer "Please follow your command by <enter>.");
+	  Commands.Wltd(d,a1,a2)
     | AGENT ->
 	let (name,params) = agent_signature lexer in
 	  (match lexer#top_token with
