@@ -15,7 +15,6 @@
 #  USA. 
 *)
 open Agent
-open Bisimulation
 
 type pp_action = I | O
 
