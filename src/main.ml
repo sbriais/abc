@@ -68,10 +68,10 @@ let see_bisim bisim =
       | _ -> ()
 
 
-let see_trace a b =
+let see_trace a b ta tb wk =
   let choix = ref None in
     while (!choix) = None do
-      Format.print_string "Do you want to see a trace that leads to distinguish the two processes (yes/no) ? ";
+      Format.print_string "Do you want to see some traces (yes/no) ? ";
       Format.print_flush (); 
       (try
 	 choix := Some(parse_yes_no lexer_stdin)
@@ -84,21 +84,54 @@ let see_trace a b =
     done;
     match (!choix) with
 	Some(true) ->
-	  let string_trace_node (a,p) = "-"^(string_of_action 0 a)^"-> "^(string_of_agent 0 p) in
-	    Format.print_string "trace of ";
-	    Format.open_box 0;
-	    pp_agent 0 a;
-	    Format.close_box();
-	    Format.print_newline();
-	    Agent.trace_left#print string_trace_node;
-	    Format.print_string "trace of ";
-	    Format.open_box 0;
-	    pp_agent 0 b;
-	    Format.close_box();
-	    Format.print_newline();
-	    Agent.trace_right#print string_trace_node;
-	    Format.print_newline();
-	    if (flush_entries pp_agent_meta) then Format.force_newline() 
+(*
+	  if false then
+	    begin
+	      let string_trace_node (a,p) = "-"^(string_of_action 0 a)^"-> "^(string_of_agent 0 p) in
+		Format.print_string "trace of ";
+		Format.open_box 0;
+		pp_agent 0 a;
+		Format.close_box();
+		Format.print_newline();
+		Agent.trace_left_strong#print string_trace_node;
+		Format.print_string "trace of ";
+		Format.open_box 0;
+		pp_agent 0 b;
+		Format.close_box();
+		Format.print_newline();
+		Agent.trace_right_weak#print string_trace_node;
+		Format.print_newline();
+		if (flush_entries pp_agent_meta) then Format.force_newline() 
+	    end
+	  else
+*)
+	    begin
+	      let show_traces p q tp tq =
+		Format.print_string "traces of ";
+		Format.print_newline ();
+		Format.print_newline ();
+		Format.open_box 0;
+		pp_agent 0 p;
+		Format.close_box();
+		Format.print_newline ();
+		Format.open_box 0;
+		pp_agent 0 q;
+		Format.close_box();
+		Format.print_newline ();
+		pp_traces tp tq wk;
+		Format.print_newline();
+		if (flush_entries pp_agent_meta) then Format.force_newline() 
+	      in
+(*
+	      let (tp,tq) = Agent.get_traces (function alpha -> Format.print_string ("-"^(string_of_action 0 alpha)^"-> ");Format.print_newline()) (Agent.trace_left_strong) (Agent.trace_right_weak) in
+		if (tp,tq) = ([],[]) then
+		  let (tq,tp) = Agent.get_traces (function alpha -> Format.print_string ("-"^(string_of_action 0 alpha)^"-> ");Format.print_newline()) (Agent.trace_right_weak) (Agent.trace_left_strong) in
+		    show_traces b a tq tp
+		else
+		  show_traces a b tp tq
+*)
+		show_traces a b ta tb
+	    end
       | _ -> ()
 		
 
@@ -125,12 +158,12 @@ let rec handle_command = function
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
 	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim) = Agent.eq env a b d in
+	let (n,bisim,(ta,tb)) = Agent.eq env a b d in
 	  (match n with
 	       0 -> 
-		 Format.print_string ("The two agents are not strongly related ("^(string_of_int (max Agent.trace_left#length Agent.trace_right#length))^").");
+		 Format.print_string ("The two agents are not strongly related ("^(string_of_int (List.length ta))^").");
 		 Format.print_newline();
-		 see_trace a b
+		 see_trace a b ta tb "-"
 	     | n -> 
 		 Format.print_string ("The two agents are strongly related ("^(string_of_int n)^").");
 		 Format.print_newline();
@@ -142,12 +175,12 @@ let rec handle_command = function
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
 	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim) = Agent.weq env a b d in
+	let (n,bisim,(ta,tb)) = Agent.weq env a b d in
 	  (match n with
 	       0 -> 
-		 Format.print_string ("The two agents are not weakly related ("^(string_of_int (max Agent.trace_left#length Agent.trace_right#length))^").");
+		 Format.print_string ("The two agents are not weakly related ("^(string_of_int (List.length ta))^").");
 		 Format.print_newline();
-		 see_trace a b
+		 see_trace a b ta tb "="
 	     | n -> 
 		 Format.print_string ("The two agents are weakly related ("^(string_of_int n)^").");
 		 Format.print_newline();

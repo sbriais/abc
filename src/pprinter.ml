@@ -326,7 +326,7 @@ let pp_dist lvl d =
   let l = NameDist.elements d in
     Format.open_box 2;
     Format.print_string "{";
-    if l != [] then 
+    if l <> [] then 
       begin
 	Format.force_newline();
 	List.iter 
@@ -460,4 +460,47 @@ and latex_of_agent_prefix lvl a b = function
 	  else "")^"."^(latex_of_agent lvl p)
 
 let pp_agent_latex lvl p = Format.print_string (latex_of_agent lvl p)
+
+let pp_traces tp tq wk =
+  let string_of_transition = function
+      Strong(alpha)  -> "-"^(string_of_action 0 alpha)^"->"
+    | Weak(alpha) -> wk^(string_of_action 0 alpha)^wk^">" in
+  let neg_transition = function
+      Strong(alpha) -> Weak(alpha)
+    | Weak(alpha) -> Strong(alpha) in
+  let print_aux (op,oq) =
+    Format.print_newline();
+    match op with
+	Some(alpha,p) ->
+	  Format.print_string (string_of_transition alpha);Format.print_newline();
+	  (match oq with 
+	       Some(beta,q) ->
+		 Format.print_string (string_of_transition beta);Format.print_newline();
+		 Format.print_newline();
+		 pp_agent_meta 0 p;Format.print_newline();
+		 pp_agent_meta 0 q;
+	     | None ->
+		 Format.print_string (string_of_transition (neg_transition alpha));Format.print_newline();
+		 Format.print_newline();
+		 pp_agent_meta 0 p;Format.print_newline();
+		 Format.print_string "*")
+      | None ->
+	  (match oq with 
+	       Some(beta,q) ->
+		 Format.print_string (string_of_transition (neg_transition beta));Format.print_newline();
+		 Format.print_string (string_of_transition beta);Format.print_newline();
+		 Format.print_newline();
+		 Format.print_string "*";Format.print_newline();
+		 pp_agent_meta 0 q;
+	     | None -> failwith "pp_traces")
+  in
+  let rec combine_rev accu = function
+      [],[] -> accu
+    | x::xs,y::ys ->
+	combine_rev ((x,y)::accu) (xs,ys)
+    | _ -> failwith "pp_traces: combine_rev"
+  in
+  let trace = List.rev (combine_rev [] (tp,tq)) in
+    pp_list Format.print_newline Format.print_newline print_aux trace
+
 
