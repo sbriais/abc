@@ -1,0 +1,5 @@
+(* the expansion law for open bisimulation *)
+agent A = (x.'y.0 + 'y.x.0 + [x=y]t.0)
+agent B = (x.0 | 'y.0)
+eq A B
+

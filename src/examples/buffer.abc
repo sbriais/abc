@@ -1,0 +1,9 @@
+(* A two-place buffer *)
+agent Buf1(i,o) = i(x).'o<x>.Buf1 i o
+agent Buf2(i,o) = (^m)(Buf1 i m | Buf1 m o)
+agent Buf20(i,o) = i(x).Buf21 i o x
+agent Buf21(i,o,x) = (i(y).Buf22 i o x y + 'o<x>.Buf20 i o)
+agent Buf22(i,o,x,y) = 'o<x>.Buf21 i o y
+
+weq Buf2 Buf20
+

@@ -96,6 +96,6 @@ depend: .depend
 	@$(CAMLDEP) $(DISTMLI) $(DISTML) $(SPECML) $(SPECMLI) > .depend
 
 dist:	
-	tar cvfz $(PRGM)-$(VERSION).tar.gz $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) --exclude compile_info.ml
+	tar cvfz $(PRGM)-$(VERSION).tar.gz $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) --exclude compile_info.ml --exclude CVS
 
 include .depend

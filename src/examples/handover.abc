@@ -1,0 +1,46 @@
+(* This file contains the handover protocol that can be found in [1] *)
+(* [1] A Verification Tool for the Polyadic Pi-Calculus, Bjorn Victor *)
+
+(* initialize the value caching rate to 100/100 *)
+scale 100
+value 100
+
+(* we make use of push/pop facilities *)
+(* we make sure the following agents are undefined *)
+clear CC HC MSC BSa BSp MS P Q System
+
+(* push some global names *)
+push in out data ho_cmd ho_acc ch_rel ho_com ho_fail
+
+(* the protocol itself *)
+(* first the "implementation" *)
+agent CC(fa,fp,l) = (in(v). 'fa<data>.'fa<v>.CC fa fp l  + l(mnew).'fa<ho_cmd>.'fa<mnew>.(fp(c).[c=ho_com]'fa<ch_rel>.fa(mold).'l<mold>.CC fp fa l  + fa(c).[c=ho_fail]'l<mnew>.CC fa fp l))
+agent HC(l,m) = 'l<m>.l(m).HC l m  
+agent MSC(fa,fp,m) = (^l)(HC l m  | CC fa fp l ) 
+agent BSa(f,m) = f(c).([c=data]f(v).'m<data>.'m<v>.BSa f m + [c=ho_cmd]f(v).'m<ho_cmd>.'m<v>.(f(c).[c=ch_rel]'f<m>.BSp f m + m(c).[c=ho_fail]'f<ho_fail>.BSa f m)) 
+agent BSp(f,m) = m(c).[c=ho_acc]'f<ho_com>.BSa f m  
+agent MS(m) = m(c).([c=data]m(v).'out<v>.MS m + [c=ho_cmd]m(mnew).('mnew<ho_acc>.MS mnew + 'm<ho_fail>.MS m )) 
+agent P(fa,fp) = (^m)(MSC fa fp m  | BSp fp m) 
+agent Q(fa) = (^m)(BSa fa m  | MS m) 
+agent System = (^fa,fp)(P fa fp  | Q fa)
+(* pop names *)
+pop 8 
+
+(* secondly, the "specification" *)
+clear Spec S1 S2 S3
+push in out
+agent Spec = (in(v).S1 v + t.Spec)
+agent S1(v1) = (in(v).S2 v1 v + 'out<v1>.Spec + t.'out<v1>.Spec)
+agent S2(v1,v2) = (in(v).S3 v1 v2 v + 'out<v1>.S1 v2 + t.'out<v1>.'out<v2>.Spec)
+agent S3(v1,v2,v3) = 'out<v1>.S2 v2 v3
+pop 2
+
+(* check weak equivalence of implementation and specification *)
+weqd (in,out,ho_acc,ho_com,data,ho_cmd,ho_acc,ch_rel,ho_fail) Spec in out System in out data ho_cmd ho_acc ch_rel ho_com ho_fail
+
+(* we make all the names used by the implementation local to the system *)
+clear Sys
+agent Sys(in,out) = (^ho_acc,ho_com,data,ho_cmd,ch_rel,ho_fail)System in out data ho_cmd ho_acc ch_rel ho_com ho_fail 
+
+(* check again weak equivalence: it is faster! *)
+weqd (in,out) Spec in out Sys in out

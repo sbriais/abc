@@ -1,0 +1,18 @@
+(* Applications of the pi-calculus *)
+(* booleans *)
+
+clear True False Cond
+
+push l
+agent True = l(tt,ff).'tt
+agent False = l(tt,ff).'ff
+pop
+
+push p q
+agent Cond(l) = (^tt,ff)'l<tt,ff>.(tt.'p + ff.'q)
+pop 2
+
+(* we can check that if true then P else Q = P *)
+(* and that if false then P else Q = Q *)
+weq (^l)(Cond(p,q,l) | True(l)) 'p
+weq (^l)(Cond(p,q,l) | False(l)) 'q
