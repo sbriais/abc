@@ -37,16 +37,23 @@
 \maketitle
 
 \begin{abstract}
-  We describe in this document how to use our tool called Another
-  Bisimilarity Checker (ABC). The ABC is a tool that checks open
-  equivalence between terms of \picalculus. Open bisimulation was
-  first defined by Sangiorgi \cite{sangiorgi:theory-bisimulation}. The
-  ABC implements the equivalence checker of the Mobility Workbench
-  \cite{victor:verification-tool}.
+  In this document, we describe how to use the Another Bisimilarity
+  Checker (ABC) which is a tool that checks for open equivalence
+  between terms of the \picalculus. Open bisimulation was first
+  defined by Sangiorgi \cite{sangiorgi:theory-bisimulation}. The ABC
+  implements the equivalence checker of the Mobility Workbench
+  \cite{victor:verification-tool}. In the following, we assume the
+  reader is familiar with the \picalculus.
+  
+  The ABC is released under the GPL. The distribution can be downloaded from
+  the ABC homepage located at:
+  \begin{center}
+  \verb£http://lampwww.epfl.ch/~sbriais/abc.html£
+\end{center}
 \end{abstract}
 
 \section{Input syntax: \picalculus terms}
-\subsection{The \picalculus}
+\subsection{The \picalculus of ABC (readable)}
 We assume a countably infinite set of names denoted by
 $a,b,x,v,\ldots$ and a disjoint set of agent identifiers denoted by
 $X$. The syntax of \picalculus terms is described by the following grammar:
@@ -85,27 +92,29 @@ The \picalculus terms accepted by the ABC are the one described by the
 previous grammar. It also allows the user to enter a \picalculus
 term written in terms of abstractions and concretions.
 
+\paragraph{Remark:} 
+We sometimes use the word \emph{name} and sometimes the word
+\emph{variable}.  However, these two words designate the same concept
+because in the case of open bisimulation, the two notions coincides.
 
-The ABC also allows to enter a term partially applied to a variable. This makes sense
-only if the term is an abstraction.
 \subsection{Input syntax}
 \begin{tabular}{cc}
 \begin{bnf}
-agent \IS factor\\
-      \OR factor \verb:"+": agent\\
-\\
-factor \IS term \\
-       \OR term \verb:"|": factor\\
-\\
-term \IS \verb:"0": \\
-      \OR ident params \\
-      \OR prefix \verb:".": term \\
-      \OR \verb:"[": vars \verb:"]": term \\
-      \OR \verb:"[": var \verb:"=": var \verb:"]": term \\
-      \OR \verb:"(": \verb:"\": vars \verb:")": term \\
-      \OR \verb:"(": \verb:"^": vars \verb:")": term \\
-      \OR term var \\
-      \OR \verb:"(": agent \verb:"):\\
+  agent \IS factor\\
+  \OR factor \verb:"+": agent\\
+  \\
+  factor \IS term \\
+  \OR term \verb:"|": factor\\
+  \\
+  term \IS \verb:"0": \\
+  \OR ident params \\
+  \OR prefix \verb:".": term \\
+  \OR \verb:"[": vars \verb:"]": term \\
+  \OR \verb:"[": var \verb:"=": var \verb:"]": term \\
+  \OR \verb:"(": \verb:"\": vars \verb:")": term \\
+  \OR \verb:"(": \verb:"^": vars \verb:")": term \\
+  \OR term var \\
+  \OR \verb:"(": agent \verb:"):\\
 \end{bnf}
 &
 \begin{bnf}
@@ -128,28 +137,40 @@ ident \IS [A-Z][a-zA-Z\_/.0-9]* \\
 \end{bnf}
 \end{tabular}
 
-\paragraph{Remark:} Actually, it is optional to write the nil process after an action.
+\paragraph{Remark:} It is optional to write the nil process after an action.
 
 \section{Commands of the ABC}
 \subsection{Agent definition}
 \label{ss:agentdef}
-\paragraph{Syntax}\mbox{}\\
 \textbf{agent} {\sffamily ident params = agent}
 
 
-Note that only \emph{closed agents}\footnote{for efficiency reasons, see also subsection \ref{ss:context}} are allowed (i.e. $\mathrm{fn}$({\sffamily agent}) $\subset${\sffamily params}).
+Note that only \emph{closed agents}\footnote{for efficiency reasons,
+  see also subsection \ref{ss:context}} are allowed (i.e.
+$\mathrm{fn}$({\sffamily agent}) $\subset${\sffamily params}).
 
 \subsection{Checking (open) equivalence}
+An open bisimulation is a family of binary relations between processes
+of the \picalculus which is indexed by a set of \emph{distinctions}. A
+distinction $D$ is an irreflexive and symmetric binary relation
+between names. It represents all the disequalities that should hold.
+It can also be used to ``simulate'' free constant names. For instance,
+assuming that you have defined an agent $P(a,b,c)$ and that you want
+$a$ to be a constant name distinct from each other name, you should
+work with the initial distinction $\{(a,b),(a,c),(b,a),(c,a)\}$.
+
 \subsubsection{Strong equivalence}
-\paragraph{Syntax}\mbox{}\\
 \textbf{eq} {\sffamily agent1 agent2}\\
 \textbf{eqd} {\sffamily (vars) agent1 agent2}
 
 
-The command \textbf{eq} checks strong equivalence between {\sffamily agent1} and {\sffamily agent2}. The command \textbf{eqd} takes into account the distinction such that each variable in {\sffamily vars} is distinct from all other free names in {\sffamily agent1} and {\sffamily agent2}.
+The command \textbf{eq} checks strong equivalence between {\sffamily
+  agent1} and {\sffamily agent2}. The command \textbf{eqd} takes into
+account the distinction such that each variable in {\sffamily vars} is
+distinct from all other free names in {\sffamily agent1} and
+{\sffamily agent2}.
 
 \subsubsection{Weak equivalence}
-\paragraph{Syntax}\mbox{}\\
 \textbf{weq} {\sffamily agent1 agent2}\\
 \textbf{weqd} {\sffamily (vars) agent1 agent2}
 
@@ -157,91 +178,56 @@ The command \textbf{eq} checks strong equivalence between {\sffamily agent1} and
 Similar to strong equivalence.
 
 \subsection{Viewing agents}
-\paragraph{Syntax}\mbox{}\\
 \textbf{print} {\sffamily agent}\\
 \textbf{show} {\sffamily agent}
 
 
-The command \textbf{print} pretty-prints the given {\sffamily agent} whereas the command \textbf{show} pretty-prints the standard form of the given {\sffamily agent}.
+The command \textbf{print} pretty-prints the given {\sffamily agent}
+whereas the command \textbf{show} pretty-prints the standard form of
+the given {\sffamily agent}.
+
+
+Recall that every abstraction $F$ can be converted to a standard form
+$F \equiv (\lambda \tilde{x})P$ by pushing restrictions inwards and
+that every concretion $C$ can be converted to a standard form $C
+\equiv (\nu \tilde{y})[\tilde{x}]P$ with $\tilde{y} \subset \tilde{x}$
+by pulling restrictions on names in $\tilde{x}$ outwards and pushing
+all others inwards.
 
 \subsection{Exploring the behaviour of an agent}
-\paragraph{Syntax}\mbox{}\\
 \textbf{step} {\sffamily agent}
 
 
-The command \textbf{step} enters in an interactive mode in which it is possible to view and simulate the (strong) commitments of the given {\sffamily agent}.
+The command \textbf{step} enters in an interactive mode in which it is
+possible to view and simulate the (strong) commitments of the given
+{\sffamily agent}.
 
 \subsection{Setting memory usage}
-\paragraph{Syntax}\mbox{}\\
 \textbf{scale} integer\\
 \textbf{value} integer
 
-The command \textbf{scale} fixes the scale for setting the memory usage. The command \textbf{value} sets the memory usage to $\frac{\textbf{value}}{\textbf{scale}}$. This rational number represents the frequency for caching computed data.
-
-\subsection{Implicit context}
-\label{ss:context}
-We found annoying to not allow open terms in agent definition (as
-mentioned in subsection \ref{ss:agentdef}). So, we added the notion of
-semi-explicit context that we call implicit context. The idea is that
-a context is a list of variables that are implicit in agent definition
-and agent application. More formally, there is a \emph{current
-  implicit context}, and each agent has an \emph{agent implicit
-  context}. If an agent is not defined, then its implicit context is
-the current one.  So, when an agent is defined, its context is the
-current one. It is possible to push or pop variables in the current
-implicit context.  When one pops variables out of the current context,
-these variables are also popped out of all the agent implicit
-contexts.
-\paragraph{Syntax}\mbox{}\\
-\textbf{push} {\sffamily var$_1$ ... var$_n$}
-
-This command pushes {\sffamily var$_1$ ... var$_n$} into the
-current context.
-
-\mbox{}\\
-\textbf{pop} [$n$]
-
-This command pops $n$ variables out of the current context ($n$ is a
-positive integer, if $n$ is not specified, then $1$ is the value by
-default).
-
-\mbox{}\\
-\textbf{implicit}
-
-This command shows the current implicit context.
-
-\mbox{}\\
-\textbf{clear} {\sffamily ident$_1$ ... ident$_n$}
-
-This command undefines the agent {\sffamily ident$_1$ ... ident$_n$}
-if they were defined.
-
+The command \textbf{scale} fixes the scale for setting the memory
+usage. The command \textbf{value} sets the memory usage to
+$\frac{\textbf{value}}{\textbf{scale}}$. This rational number
+represents the frequency for caching computed data.
 
 \subsection{Other commands}
 \subsubsection{Help}
-\paragraph{Syntax}\mbox{}\\
 \textbf{help}
 
 The command \textbf{help} give the user some help.
 
 \subsubsection{Resetting the ABC}
-\paragraph{Syntax}\mbox{}\\
 \textbf{reset}
 
 This command clears all the memory of the ABC.
 
 \subsubsection{Loading a file}
-\paragraph{Syntax}\mbox{}\\
-\textbf{load} {\sffamily filename}\\
 \textbf{load} ``{\sffamily filename}''
 
 This command loads the given file in the ABC.
 
-In the first syntax (i.e. without quotes), we should have {\sffamily
-  filename} $\in$ {\sffamily var}$\cup${\sffamily ident}.
-
 \subsubsection{Exiting}
-\paragraph{Syntax}\mbox{}\\
 \textbf{exit}
 
 \textbf{exit} makes you exit the ABC.
@@ -249,12 +235,12 @@ In the first syntax (i.e. without quotes), we should have {\sffamily
 
 \section{Examples}
 \subsection{A beginner's example}
-Let us start the ABC.
 \begin{verbatim}
 bash-2.05b$ ./abc.opt
 Welcome to Another Bisimulation Checker
 \end{verbatim}
-Let us define agents $\FUN{A}$ and $\FUN{B}$ with 
+
+After having started the ABC, we define the agents $\FUN{A}$ and $\FUN{B}$ with 
 $$
 \begin{array}{rcl}
 \APPLY{A}{x,y} & \EQDEF & \PAR{\PREFIX{\INPUT{x}{}}{\NIL}}{\PREFIX{\OUTPUT{}{y}{}}{\NIL}} \\
@@ -267,7 +253,10 @@ Agent A is defined.
 abc > agent B(x,y) = x.'y.0 + 'y.x.0
 Agent B is defined.
 \end{verbatim}
-It is well known that $\APPLY{A}{x,y} \not\sim^{\mathrm{o}}_{\EMPTY} \APPLY{B}{x,y}$\footnote{$\sim^{\mathrm{o}}_D$ is the open bisimilarity with the set of distinctions $D$.}.
+
+It is well known that $\APPLY{A}{x,y} \not\sim^{\mathrm{o}}_{\EMPTY}
+\APPLY{B}{x,y}$\footnote{$\sim^{\mathrm{o}}_D$ is the open
+  bisimilarity with the set of distinctions $D$.}.
 \begin{verbatim}
 abc > eq A(x,y) B(x,y)
 The two agents are not strongly related (2).
@@ -278,7 +267,9 @@ trace of B x y
  
 
 \end{verbatim}
-Indeed, $\APPLY{A}{x,y}$ can perform a $\TAU$ commitment that $\APPLY{B}{x,y}$ can't (as shown in the trace).
+
+Indeed, $\APPLY{A}{x,y}$ can perform a $\TAU$ commitment that
+$\APPLY{B}{x,y}$ can't (as shown in the trace).
 \begin{verbatim}
 abc > step A(x,y)
 1: { x=y }  =>  A x y --t-> 0
@@ -302,7 +293,8 @@ no more commitments
 \end{verbatim}
 
 \paragraph{Remark:}
-We see above that the commitments are shown numbered. Each commitment has the form: 
+We see above that the commitments are shown numbered. Each commitment
+has the form:
 \begin{verbatim}
 a set of conditions => agent --action--> agent
 \end{verbatim}
@@ -311,7 +303,7 @@ the commitment to take place.
 
 \bigskip
 
-Thus, it is easy to see that $\APPLY{A}{x,y} \sim^{\mathrm{o}}_{\SET{x \not= y}} \APPLY{B}{x,y}$.
+Thus, $\APPLY{A}{x,y} \sim^{\mathrm{o}}_{\SET{x \not= y}} \APPLY{B}{x,y}$.
 \begin{verbatim}
 abc > eqd (x,y) A(x,y) B(x,y)
 The two agents are strongly related (3).
@@ -360,6 +352,7 @@ $$
 abc > agent C(x,y) = B(x,y) + [x=y]t.0
 Agent C is defined.
 \end{verbatim}
+
 We have $\APPLY{A}{x,y} \sim^{\mathrm{o}}_{\EMPTY} \APPLY{C}{x,y}$.
 \begin{verbatim}
 abc > eq A(x,y) C(x,y)
@@ -391,13 +384,91 @@ Do you want to see the core of the bisimulation (yes/no) ? yes
   )
 }
 \end{verbatim}
+
 End of this example.
 \begin{verbatim}
 abc > exit
 bash-2.05b$
 \end{verbatim}
 
-\subsection{Usage of the implicit context}
+\subsection{Implicit context}
+\label{ss:context}
+What about free names? The notion of \emph{implicit context} is our
+answer to the limitation explained in Subsection \ref{ss:agentdef}.
+It appears often, when defining a system, that several agents use
+exactly the same parameters that can be seen as free names on which
+the system depends. The following example illustrates this fact:
+$$
+\begin{array}{rcl}
+\FUN{Buf}_{20}(in,out) & = & \PREFIX{\INPUT{in}{x}}{\FUN{Buf}_{21}(in,out,x)} \\
+\FUN{Buf}_{21}(in,out,x) & = & \SUM{\PREFIX{\INPUT{in}{y}}{\FUN{Buf}_{22}(in,out,x,y)}}{\PREFIX{\OUTPUT{}{out}{x}}{\FUN{Buf}_{20}(in,out)}} \\
+\FUN{Buf}_{22}(in,out,x,y) & = & \PREFIX{\OUTPUT{}{out}{y}}{\FUN{Buf}_{21}(in,out,x)}
+\end{array}
+$$
+
+If free names were allowed, we would have assumed to have two names
+$in$ and $out$ and written:
+$$
+\begin{array}{rcl}
+\FUN{Buf}_{20} & = & \PREFIX{\INPUT{in}{x}}{\FUN{Buf}_{21}(x)} \\
+\FUN{Buf}_{21}(x) & = & \SUM{\PREFIX{\INPUT{in}{y}}{\FUN{Buf}_{22}(x,y)}}{\PREFIX{\OUTPUT{}{out}{x}}{\FUN{Buf}_{20}}} \\
+\FUN{Buf}_{22}(x,y) & = & \PREFIX{\OUTPUT{}{out}{y}}{\FUN{Buf}_{21}(x)}
+\end{array}
+$$
+
+This mechanism is precisely the one behind implicit context (actually,
+it should be qualified semi-explicit context).
+
+The idea is that a context is a stack of names. Each agent has its own
+context. Moreover, there is a current context which is global. When an
+agent is not defined, its context is the current one which evolve
+dynamically. It is possible to push names in the current context or to
+push names out of it. When an agent is defined, its context during his
+definition is, as previously said, the current one and it is
+duplicated to be its own context. The context of an agent can only
+shrink but not grow. So, when a name is pushed in the current context,
+the contexts of the defined agents do not evolve whereas when a name
+is popped out of the current context, this name is popped out of the
+contexts of all the defined agents that contained it. When an agent
+$A$ is used in the definition of another agent $B$, the agent $A$ is
+partially applied to its context. So, if the context of $A$ was $x,y$
+and the one of $B$ was $x,y,z$, when writing $A$ into the definition
+of $B$ was understood as $A(x,y)$ (in fact: $A x y$).  We warn the
+reader to be very careful when re-loading a file for example (or
+redefining an agent). Indeed, since the context of an undefined agent
+is the current one and the context of an already defined agent is its
+own one, there can happen some strange things when defining two times
+a recursive agent (or two mutually recursive agents). That is why
+there is a command to undefine an agent.
+
+Here are the added commands to handle implicit contexts:
+
+\mbox{}\\
+\textbf{push} {\sffamily var$_1$ ... var$_n$}
+
+This command pushes {\sffamily var$_1$ ... var$_n$} into the
+current context.
+
+\mbox{}\\
+\textbf{pop} [$n$]
+
+This command pops $n$ variables out of the current context ($n$ is a
+positive integer, if $n$ is not specified, then $1$ is the value by
+default).
+
+\mbox{}\\
+\textbf{implicit}
+
+This command shows the current implicit context.
+
+\mbox{}\\
+\textbf{clear} {\sffamily ident$_1$ ... ident$_n$}
+
+This command undefines the agent {\sffamily ident$_1$ ... ident$_n$}
+if they were defined.
+
+The next subsection rewrites the example of this subsection in ABC.
+
 \subsubsection{Basic example}
 At the beginning, the current implicit context is empty.
 \begin{verbatim}
@@ -407,115 +478,144 @@ abc > implicit
 No implicit variables.
 \end{verbatim}
 
-Assume that we want to define an agent $\APPLY{A}{x} \EQDEF
-\SUM{\PREFIX{\INPUT{x}{}}{\NIL}}{\PREFIX{\TAU}{\APPLY{A}{x}}}$, but with using the concept of implicit
-context. 
+We first push $in$ and $out$ into the current context.
+\begin{verbatim}
+abc > push in out
+Pushing in out
+abc > implicit
+Implicit variables are in out
+\end{verbatim}
 
+We then define the agent $\FUN{Buf}_{20}$.
+\begin{verbatim}
+abc > agent Buf20 = in(x).Buf21(x)
+Agent Buf20 is defined.
+\end{verbatim}
 
-We first push $x$ into the current context.
+Let us check the standard form of $\FUN{Buf}_{20}$.
+\begin{verbatim}
+abc > show Buf20
+in(x0). Buf21 in out x0
+\end{verbatim}
+
+Note that when we write $\FUN{Buf}_{21}$, it really means $\FUN{Buf}_{21}\ in\ out$, since the implicit
+context of $\FUN{Buf}_{21}$ is the current one which is $in\ out$ as shown by the command \verb£implicit£.
+\begin{verbatim}
+abc > implicit
+Implicit variables are in out
+\end{verbatim}
+
+We continue by defining the agents $\FUN{Buf}_{21}$ and $\FUN{Buf}_{22}$. However,
+we can notice that $x$ is also a common additionnal parameter of these
+two agents. So, we add $x$ to the current context and then define the agents.
+
 \begin{verbatim}
 abc > push x
 Pushing x
+abc > agent Buf21 = 'out<x>.Buf20 + in(y).Buf22 y
+Agent Buf21 is defined.
+abc > agent Buf22(y) = 'out<y>.Buf21
+Agent Buf22 is defined.
+\end{verbatim}
+
+We then display the standard form of the three agents and the current
+context.
+\begin{verbatim}
 abc > implicit
-Implicit variables are x
+Implicit variables are in out x
+abc > show Buf20
+in(x0). Buf21 in out x0
+abc > show Buf21
+( 'out<x>. Buf20 in out +  in(x0). Buf22 in out x x0 )
+abc > show Buf22
+(\x0) 'out<x0>. Buf21 in out x
 \end{verbatim}
 
-We then define our agent $A$.
+We can now pop all the ``free names'' and redo the same actions.
 \begin{verbatim}
-abc > agent A = x.0 + t.A
-Agent A is defined.
-\end{verbatim}
-
-Let us see what is the standard form of $A$.
-\begin{verbatim}
-abc > show A
-( x. 0 +  t. A x )
-\end{verbatim}
-Note that when we write $A$, it really means $A\ x$, since the implicit
-context of $A$ is $x$.
-
-
-Now, we push another name $y$, see the standard form of $A$ and then
-we pop the two names we had pushed and see again the standard form of
-$A$.
-\begin{verbatim}
-abc > push y
-Pushing y
-abc > implicit
-Implicit variables are x y
-abc > show A
-( x. 0 +  t. A x )
-abc > pop 2
-Popping at most 2 variables.
+abc > pop 3
+Popping x out in
 abc > implicit
 No implicit variables.
-abc > show A
-(\x0) ( x0. 0 +  t. A x0 )
-abc > exit
-bash-2.05b$
+abc > show Buf20
+(\x0, x1) x0(x2). Buf21 x0 x1 x2
+abc > show Buf21
+(\x0, x1, x2) ( 'x1<x2>. Buf20 x0 x1 +  x0(x3). Buf22 x0 x1 x2 x3 )
+abc > show Buf22
+(\x0, x1, x2, x3) 'x1<x3>. Buf21 x0 x1 x2
 \end{verbatim}
 
-\subsubsection{Advanced example}
-One difficulty that appears with the concept of implicit context is
-the behavior when there is mutually recursive agent definitions.
-
-
-In the following, we define two mutually recursive agents $A$ and $B$,
-with $\APPLY{A}{x} = \PREFIX{\INPUT{x}{y}}{\APPLY{B}{x,y}}$ and
-$\APPLY{B}{x,y} = \PREFIX{\OUTPUT{}{x}{}}{\APPLY{A}{x}}$.
+If we prefer, in a more readable setting:
 \begin{verbatim}
-bash-2.05b$ ./abc
-Welcome to Another Bisimulation Checker
-abc > push x
-Pushing x
-abc > agent A = x(y).B y
-Agent A is defined.
-abc > show A
-x(x0). B x x0
-abc > push y
-Pushing y
-abc > agent B = 'x.A
-Agent B is defined.
-abc > show B
-'x. A x
-abc > pop
-Popping at most 1 variables.
-abc > implicit
-Implicit variables are x
-abc > show A
-x(x0). B x x0
-abc > show B
-(\x0) 'x. A x
-abc > show A
-(\x0) x0(x1). B x0 x1
-abc > show B
-(\x0, x1) 'x0. A x0
+abc > show Buf20 in out
+in(x0). Buf21 in out x0
+abc > show Buf21 in out x
+( 'out<x>. Buf20 in out +  in(x0). Buf22 in out x x0 )
+abc > show Buf22 in out x y
+'out<y>. Buf21 in out x
 \end{verbatim}
 
-Now, we redo the same actions, to illustrate the use of \textbf{clear}.
-\begin{verbatim}
-abc > push x
-Pushing x
-abc > agent A = x(y).B y
-Agent A is defined.
-abc > show A
-x(x0). B x0
-\end{verbatim}
+%% \subsubsection{Advanced example}
+%% One difficulty that appears with the concept of implicit context is
+%% the behavior when there is mutually recursive agent definitions.
 
-We see here that the behaviour is not the one we want. Indeed, now $x$
-is not an implicit parameter of $B$ since $B$ is already defined and
-the implicit context of $B$ is now empty. So, we have to clear the
-definition of $B$ before redoing the same commands.
-\begin{verbatim}
-abc > clear B
-Clearing B
-abc > agent A = x(y).B y
-Agent A is defined.
-abc > show A
-x(x0). B x x0
-\end{verbatim}
 
-And then, we can continue as before.
+%% In the following, we define two mutually recursive agents $A$ and $B$,
+%% with $\APPLY{A}{x} = \PREFIX{\INPUT{x}{y}}{\APPLY{B}{x,y}}$ and
+%% $\APPLY{B}{x,y} = \PREFIX{\OUTPUT{}{x}{}}{\APPLY{A}{x}}$.
+%% \begin{verbatim}
+%% bash-2.05b$ ./abc
+%% Welcome to Another Bisimulation Checker
+%% abc > push x
+%% Pushing x
+%% abc > agent A = x(y).B y
+%% Agent A is defined.
+%% abc > show A
+%% x(x0). B x x0
+%% abc > push y
+%% Pushing y
+%% abc > agent B = 'x.A
+%% Agent B is defined.
+%% abc > show B
+%% 'x. A x
+%% abc > pop
+%% Popping at most 1 variables.
+%% abc > implicit
+%% Implicit variables are x
+%% abc > show A
+%% x(x0). B x x0
+%% abc > show B
+%% (\x0) 'x. A x
+%% abc > show A
+%% (\x0) x0(x1). B x0 x1
+%% abc > show B
+%% (\x0, x1) 'x0. A x0
+%% \end{verbatim}
+
+%% Now, we redo the same actions, to illustrate the use of \textbf{clear}.
+%% \begin{verbatim}
+%% abc > push x
+%% Pushing x
+%% abc > agent A = x(y).B y
+%% Agent A is defined.
+%% abc > show A
+%% x(x0). B x0
+%% \end{verbatim}
+
+%% We see here that the behaviour is not the one we want. Indeed, now $x$
+%% is not an implicit parameter of $B$ since $B$ is already defined and
+%% the implicit context of $B$ is now empty. So, we have to clear the
+%% definition of $B$ before redoing the same commands.
+%% \begin{verbatim}
+%% abc > clear B
+%% Clearing B
+%% abc > agent A = x(y).B y
+%% Agent A is defined.
+%% abc > show A
+%% x(x0). B x x0
+%% \end{verbatim}
+
+%% And then, we can continue as before.
 
 \bibliographystyle{alpha}
 \bibliography{biblio}
