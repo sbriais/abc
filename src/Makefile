@@ -64,7 +64,7 @@ $(PRGM) : $(OBJS) $(CMI)
 compile_info.ml: Makefile
 	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
 	@echo "let version=\""$(VERSION)"\";;" >> compile_info.ml
-	@echo "let build_info=\""`uname -a`"\";;" >> compile_info.ml
+	@echo "let build_info=\""`uname -msrn`"\";;" >> compile_info.ml
 
 lexer.ml: lexer.mll 
 	$(CAMLLEX) $(LEXFLAGS) lexer.mll
