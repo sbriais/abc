@@ -37,11 +37,11 @@
 \maketitle
 
 \begin{abstract}
-  In this document, we describe how to use the Another Bisimilarity
-  Checker (ABC) which is a tool that checks for open equivalence
-  between terms of the \picalculus. Open bisimulation was first
-  defined by Sangiorgi \cite{sangiorgi:theory-bisimulation}. The ABC
-  implements the equivalence checker of the Mobility Workbench
+  In this document, we describe how to use the ABC (Another
+  Bisimilarity Checker) which is a tool that checks for open
+  equivalence between terms of the \picalculus. Open bisimulation was
+  first defined by Sangiorgi \cite{sangiorgi:theory-bisimulation}. The
+  ABC implements the equivalence checker of the Mobility Workbench
   \cite{victor:verification-tool}. In the following, we assume the
   reader is familiar with the \picalculus.
   
@@ -53,7 +53,7 @@
 \end{abstract}
 
 \section{Input syntax: \picalculus terms}
-\subsection{The \picalculus of ABC (readable)}
+\subsection{The \picalculus of ABC}
 We assume a countably infinite set of names denoted by
 $a,b,x,v,\ldots$ and a disjoint set of agent identifiers denoted by
 $X$. The syntax of \picalculus terms is described by the following grammar:
@@ -73,14 +73,13 @@ $\alpha$ \IS $\INPUT{a}{\TUPLE{x}}$
 As usual, we write $\TUPLE{v}$ as a shortcut for $v_1,\ldots,v_n$ for some $n$.
 
 Sometimes, \picalculus syntax is presented in terms of concretions and
-abstractions. A concretion is mainly something like $\CONC{\TUPLE{v}}{C}$
-where $C$ is a process or a concretion. An abstraction is mainly
-something like $\LAMBDA{\TUPLE{x}}{A}$ where $A$ is a process or an
-abstraction. In this setting, prefixes are either $\TAU$, an input
-name $\INPUT{a}{}$ or an output name $\OUTPUT{}{a}{}$. The presentation
-in terms of concretions and abstractions make the labelled-transition
-semantics easier to write.
-It is easy to convert classic syntax to this one. Indeed, we have
+abstractions. A concretion is $\CONC{\TUPLE{v}}{C}$ where $C$ is a
+process or a concretion. An abstraction is $\LAMBDA{\TUPLE{x}}{A}$
+where $A$ is a process or an abstraction. In this setting, prefixes
+are either $\TAU$, an input name $\INPUT{a}{}$ or an output name
+$\OUTPUT{}{a}{}$. The presentation in terms of concretions and
+abstractions make the labelled-transition semantics easier to write.
+It is easy to convert classic syntax to this one.  Indeed, we have
 $$
 \begin{array}{rcl}
 \PREFIX{\INPUT{a}{\TUPLE{x}}}{P} & \equiv & \PREFIX{\INPUT{a}{}}{\LAMBDA{\TUPLE{x}}{P}} \\
@@ -151,7 +150,7 @@ $\mathrm{fn}$({\sffamily agent}) $\subset${\sffamily params}).
 
 \subsection{Checking (open) equivalence}
 An open bisimulation is a family of binary relations between processes
-of the \picalculus which is indexed by a set of \emph{distinctions}. A
+of the \picalculus that is indexed by a set of \emph{distinctions}. A
 distinction $D$ is an irreflexive and symmetric binary relation
 between names. It represents all the disequalities that should hold.
 It can also be used to ``simulate'' free constant names. For instance,
@@ -198,7 +197,7 @@ all others inwards.
 \textbf{step} {\sffamily agent}
 
 
-The command \textbf{step} enters in an interactive mode in which it is
+The command \textbf{step} enters an interactive mode in which it is
 possible to view and simulate the (strong) commitments of the given
 {\sffamily agent}.
 
@@ -206,10 +205,10 @@ possible to view and simulate the (strong) commitments of the given
 \textbf{scale} integer\\
 \textbf{value} integer
 
-The command \textbf{scale} fixes the scale for setting the memory
-usage. The command \textbf{value} sets the memory usage to
-$\frac{\textbf{value}}{\textbf{scale}}$. This rational number
-represents the frequency for caching computed data.
+By default, ABC stores all the computations. However, this can be too
+much memory consuming for large systems. So, it is possible to tell
+ABC to store only a fraction of the computations defined by the ratio
+$\frac{\textbf{value}}{\textbf{scale}}$.
 
 \subsection{Other commands}
 \subsubsection{Help}
@@ -406,8 +405,8 @@ $$
 \end{array}
 $$
 
-If free names were allowed, we would have assumed to have two names
-$in$ and $out$ and written:
+If free names were allowed, we would have simply assumed to have two
+names $in$ and $out$. Then, we could have written:
 $$
 \begin{array}{rcl}
 \FUN{Buf}_{20} & = & \PREFIX{\INPUT{in}{x}}{\FUN{Buf}_{21}(x)} \\
@@ -416,30 +415,67 @@ $$
 \end{array}
 $$
 
-This mechanism is precisely the one behind implicit context (actually,
-it should be qualified semi-explicit context).
+This mechanism is precisely the one behind implicit contexts
+(actually, it should be called semi-explicit context).
 
 The idea is that a context is a stack of names. Each agent has its own
-context. Moreover, there is a current context which is global. When an
-agent is not defined, its context is the current one which evolve
-dynamically. It is possible to push names in the current context or to
-push names out of it. When an agent is defined, its context during his
-definition is, as previously said, the current one and it is
+context. Moreover, there is a \emph{current context} which is global.
+When an agent is not defined, its context is the current one (which
+evolves dynamically). It is possible to push names into the current
+context or to push names out of it. When an agent is defined, its
+context at the moment of its definition is the current one and it is
 duplicated to be its own context. The context of an agent can only
-shrink but not grow. So, when a name is pushed in the current context,
-the contexts of the defined agents do not evolve whereas when a name
-is popped out of the current context, this name is popped out of the
-contexts of all the defined agents that contained it. When an agent
-$A$ is used in the definition of another agent $B$, the agent $A$ is
-partially applied to its context. So, if the context of $A$ was $x,y$
-and the one of $B$ was $x,y,z$, when writing $A$ into the definition
-of $B$ was understood as $A(x,y)$ (in fact: $A x y$).  We warn the
-reader to be very careful when re-loading a file for example (or
-redefining an agent). Indeed, since the context of an undefined agent
-is the current one and the context of an already defined agent is its
-own one, there can happen some strange things when defining two times
-a recursive agent (or two mutually recursive agents). That is why
-there is a command to undefine an agent.
+shrink but not grow. So, when a name is pushed into the current
+context, the contexts of the defined agents do not evolve whereas when
+a name is popped out of the current context, this name is popped out
+of the contexts of all the defined agents that contained it. When
+using the implicit contexts, it is a good idea to have in mind the
+following scheme:
+
+\begin{verbatim}
+(* A and B are undefined *)
+(* the current context is empty *)
+push x
+  (* the context of A is x *)
+  (* the context of B is x *)
+  agent A = ... B ... (* the context of A is x *)
+  push y
+    (* the context of A is x *)
+    (* the context of B is x y *)
+    agent B =  ... (* the context of B is x y *)
+    push z
+      (* the context of A is x *)
+      (* the context of B is x y *)
+    ...
+    pop
+    (* the context of A is x *)
+    (* the context of B is x y *)
+  pop
+  (* the context of A is x *)
+  (* the context of B is x *)
+pop
+(* the context of A is empty *)
+(* the context of B is empty *)
+push x
+  (* the context of A is empty *)
+  (* the context of B is empty *)
+  agent A = ... B ... (* the context of A is x *)
+  ...
+pop
+(* the context of A is empty *)
+(* the context of B is empty *)
+\end{verbatim}
+
+When an agent $A$ is used in the definition of another agent $B$, the
+agent $A$ is partially applied to its context. So, if the context of
+$A$ was $x,y$ and the one of $B$ was $x,y,z$, writing $A$ into the
+definition of $B$ is understood as $A(x,y)$ (in fact: $A\ x\ y$).  We
+warn the reader to be very careful when, for example, re-loading a
+file (or redefining an agent). Indeed, since the context of an
+undefined agent is the current one and the context of an already
+defined agent is its own one, there may be unintended effects when
+re-defining two (or more) mutually recursive agents. That is why there
+is a command to undefine an agent.
 
 Here are the added commands to handle implicit contexts:
 
@@ -498,8 +534,10 @@ abc > show Buf20
 in(x0). Buf21 in out x0
 \end{verbatim}
 
-Note that when we write $\FUN{Buf}_{21}$, it really means $\FUN{Buf}_{21}\ in\ out$, since the implicit
-context of $\FUN{Buf}_{21}$ is the current one which is $in\ out$ as shown by the command \verb£implicit£.
+Note that when the user write $\FUN{Buf}_{21}$, it really means
+$\FUN{Buf}_{21}\ in\ out$, since the implicit context of
+$\FUN{Buf}_{21}$ is the current one which is $in\ out$ as shown by the
+command \verb£implicit£.
 \begin{verbatim}
 abc > implicit
 Implicit variables are in out
