@@ -279,7 +279,7 @@ let rec handle_command = function
   | Help ->
       begin
 	Format.print_string ("ABC v. "^(Compile_info.version));Format.print_newline ();
-	Format.print_string ("build on "^(Compile_info.build_info)^" on the "^(Compile_info.date_of_compile));Format.print_newline ();
+	Format.print_string ("built on "^(Compile_info.build_info)^" on the "^(Compile_info.date_of_compile));Format.print_newline ();
 	Format.print_string "---";Format.print_newline ();
 	Format.print_string "agent <Name[(params)]> = <agent>";Format.print_newline();
 	Format.print_string "- define the agent <Name(params)> with the body <agent>";Format.print_newline();
