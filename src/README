@@ -21,7 +21,9 @@ installation procedure has been tested under Linux RedHat 8.0, Linux
 Mandrake 9.x and Windows XP (with Cygwin).
 
 We assume moreover that you have put the content of the archive in the
-directory /usr/local/abc.
+directory /usr/local/abc (this can be any other directory of your
+choice but in the following, we give commands assuming you have chosen
+/usr/local/abc).
 
 How to compile: 
 --------------- 
@@ -41,6 +43,7 @@ How to use:
 Depending on which target you have decided to build the ABC, type
 '/usr/local/abc/abc' or '/usr/local/abc/abc.opt' to launch the ABC.
 More detailed explanations can be found in the User's Guide.
+Examples can be found in the subdirectory examples.
 
 How to rebuild the Makefile:
 ---------------------------- 
@@ -52,7 +55,6 @@ the file Makefile.am and builds with the help of the Makefile.in
 
 Line editor:
 ------------
-
 You will notice quickly that the toplevel of ABC is not really
 user-friendly. To enhance the ABC, we strongly advise you to install
 'ledit' which is a tool made by Daniel de Rauglaudre that gives any

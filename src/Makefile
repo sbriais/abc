@@ -41,7 +41,7 @@ CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multise
 OBJS= conditions.cmo distinctions.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo compile_info.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
 CMX = $(OBJS:.cmo=.cmx)
 
-EXTRADIST = make_ocaml Makefile.am README LICENSE abc_ug.ps Makefile
+EXTRADIST = make_ocaml Makefile.am README LICENSE abc_ug.ps examples Makefile
 
 SPECIAL=$(EXTRADIST) .depend Makefile.am
 
