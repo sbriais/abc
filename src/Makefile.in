@@ -67,9 +67,9 @@ $(PRGM) : $(OBJS) $(CMI)
 	$(CAMLC) $(COMMONFLAGS) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
 
 compile_info.ml: Makefile
-	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
-	@echo "let version=\""$(VERSION)"\";;" >> compile_info.ml
-	@echo "let build_info=\""`uname -msrn`"\";;" >> compile_info.ml
+	@echo "let date_of_compile=\""`date`"\"" > compile_info.ml
+	@echo "let version=\""$(VERSION)"\"" >> compile_info.ml
+	@echo "let build_info=\""`uname -msrn`"\"" >> compile_info.ml
 
 @@LEXERRULE1@@
 	@@LEXERRULE1B@@

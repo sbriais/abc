@@ -15,7 +15,6 @@
 #  USA. 
 *)
 open Commands
-(*open Pprinter*)
 
 let env = new Agent.environment
 
@@ -342,29 +341,30 @@ let rec handle_command = function
 	!Formatter.format#print_string (Compile_info.date_of_compile);!Formatter.format#print_newline ();
 	!Formatter.format#print_string "---";!Formatter.format#print_newline ();
 	!Formatter.format#print_string "agent <Name[(params)]> = <agent>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- define the agent <Name(params)> with the body <agent>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   define the agent <Name(params)> with the body <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "eq <agent1> <agent2>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- check strong equivalence between <agent1> and <agent2>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   check strong equivalence between <agent1> and <agent2>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "eqd <(v1,...,vn)> <agent1> <agent2>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- check strong equivalence between <agent1> and <agent2> with distinction pwd(v1,...,vn,fn agent1,fn agent2)";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   check strong equivalence between <agent1> and <agent2> with distinction pwd(v1,...,vn,fn agent1,fn agent2)";!Formatter.format#print_newline();
 	!Formatter.format#print_string "weq <agent1> <agent2>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- check weak equivalence between <agent1> and <agent2>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   check weak equivalence between <agent1> and <agent2>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "weqd <(v1,...,vn)> <agent1> <agent2>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- check weak equivalence between <agent1> and <agent2> with distinction pwd(v1,...,vn,fn agent1,fn agent2)";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   check weak equivalence between <agent1> and <agent2> with distinction pwd(v1,...,vn,fn agent1,fn agent2)";!Formatter.format#print_newline();
 	!Formatter.format#print_string "show <agent>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- show standard form of <agent>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   show standard form of <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "print <agent>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- (pretty-)print <agent>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   (pretty-)print <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "latex <agent>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- generate LaTeX code for <agent> (use some LaTeX macros)";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   generate LaTeX code for <agent> (use some LaTeX macros)";!Formatter.format#print_newline();
 	!Formatter.format#print_string "step <agent>";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- interactive exploration of the commitments of <agent>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   interactive exploration of the commitments of <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "reset";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- reinitialise the workbench";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   reinitialise the workbench";!Formatter.format#print_newline();
 	!Formatter.format#print_string "exit";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- exit the workbench";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   exit the workbench";!Formatter.format#print_newline();
 	!Formatter.format#print_string "help";!Formatter.format#print_newline();
-	!Formatter.format#print_string "- this help";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   this help";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   further information can be found in the ABC user guide";!Formatter.format#print_newline();
       end
   | Rate(n) ->
       if (0 <= n) && (n <= !Agent.max_rate) then

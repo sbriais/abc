@@ -44,7 +44,7 @@ CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multise
 OBJS= conditions.cmo distinctions.cmo formatter.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo compile_info.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
 CMX = $(OBJS:.cmo=.cmx)
 
-EXTRADIST = make_ocaml Makefile.am README LICENSE abc_ug.ps examples Makefile
+EXTRADIST = make_ocaml Makefile.in README LICENSE abc_ug.ps examples Makefile
 
 SPECIAL=$(EXTRADIST) .depend Makefile.am
 
@@ -67,9 +67,9 @@ $(PRGM) : $(OBJS) $(CMI)
 	$(CAMLC) $(COMMONFLAGS) $(LINKFLAGS) $(LIBS) -o $(PRGM) $(OBJS) 
 
 compile_info.ml: Makefile
-	@echo "let date_of_compile=\""`date`"\";;" > compile_info.ml
-	@echo "let version=\""$(VERSION)"\";;" >> compile_info.ml
-	@echo "let build_info=\""`uname -msrn`"\";;" >> compile_info.ml
+	@echo "let date_of_compile=\""`date`"\"" > compile_info.ml
+	@echo "let version=\""$(VERSION)"\"" >> compile_info.ml
+	@echo "let build_info=\""`uname -msrn`"\"" >> compile_info.ml
 
 lexer.ml: lexer.mll 
 	$(CAMLLEX) $(LEXFLAGS) lexer.mll
