@@ -84,20 +84,21 @@ let see_trace a b =
     done;
     match (!choix) with
 	Some(true) ->
-	  Format.print_string "trace of ";
-	  Format.open_box 0;
-	  pp_agent 0 a;
-	  Format.close_box();
-	  Format.print_newline();
-	  Agent.trace_left#print (function (a,p) -> "-"^(string_of_action 0 a)^"-> "^(string_of_agent 0 p));
-	  Format.print_string "trace of ";
-	  Format.open_box 0;
-	  pp_agent 0 b;
-	  Format.close_box();
-	  Format.print_newline();
-	  Agent.trace_right#print (function (a,p) -> "-"^(string_of_action 0 a)^"-> "^(string_of_agent 0 p));
-	  Format.print_newline();
-	  if (flush_entries pp_agent_meta) then Format.force_newline() 
+	  let string_trace_node (a,p) = "-"^(string_of_action 0 a)^"-> "^(string_of_agent 0 p) in
+	    Format.print_string "trace of ";
+	    Format.open_box 0;
+	    pp_agent 0 a;
+	    Format.close_box();
+	    Format.print_newline();
+	    Agent.trace_left#print string_trace_node;
+	    Format.print_string "trace of ";
+	    Format.open_box 0;
+	    pp_agent 0 b;
+	    Format.close_box();
+	    Format.print_newline();
+	    Agent.trace_right#print string_trace_node;
+	    Format.print_newline();
+	    if (flush_entries pp_agent_meta) then Format.force_newline() 
       | _ -> ()
 		
 

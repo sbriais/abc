@@ -812,6 +812,11 @@ let bisim_neq p q d =
 
 class ['a] arbreMutable (elem:'a) =
   let indente n = print_string (String.make n ' ') in
+  let rec last = function 
+      [] -> []
+    | [x] -> [x]
+    | _::xs -> last xs in
+  let last x = x in 
 object(self)
   val mutable sons = []
   val mutable father = None
@@ -841,7 +846,7 @@ object(self)
       if self#isLeaf then
 	print_newline()
       else
-	ignore (List.fold_left (fun b fils -> fils#pp toString b (n+1+elemLen);false) true sons)
+	ignore (List.fold_left (fun b fils -> fils#pp toString b (n+1+elemLen);false) true (last sons))
   method isLeaf =
     match sons with
 	[] -> true

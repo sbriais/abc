@@ -47,6 +47,31 @@ let parse_error lexer str =
   parse_until_token EOL lexer;
   failwith str
 
+let intelligent_parsing s tokens lexer k_ok k_fail =
+  let warning s token adv =
+    warn (s^" "^adv^" means "^((function Some(s) -> s) (reverse token)))
+  in
+    (match (find_nearest s (keywords tokens)) with
+	 Some(d,t) ->
+	   (if d <= 0.5 then
+	      begin
+		warning s t "certainly";
+		let _ = lexer#push_token [t] in k_ok ()
+	      end
+	    else
+	      if d <= 1.0 then
+		begin
+		  warning s t "probably";
+		  let _ = lexer#push_token [t] in k_ok ()
+		end
+	      else
+		begin
+		  warning s t "maybe";
+		  warn "I don't try to continue.";
+		  k_fail ()
+		end)
+       | _ -> k_fail ())
+
 let rec yes_no lexer =
   match lexer#pop_token with
       YES -> 
@@ -57,15 +82,18 @@ let rec yes_no lexer =
 	false
     | IDENT(s)
     | VAR(s) ->
-	(match find_nearest s (keywords [YES;NO]) with
-	     Some(d,t) ->
-	       if d <= 1. then
-		 let _ = lexer#push_token [t] in 
-		   warn (s^" probably means "^((function Some(s) -> s) (reverse t)));
-		   yes_no lexer
-	       else 
-		 parse_error lexer "Please answer by yes or no followed by <enter>."
-	   | _ -> parse_error lexer "Please answer by yes or no followed by <enter>.")
+	(*
+	  (match find_nearest s (keywords [YES;NO]) with
+	  Some(d,t) ->
+	  if d <= 1. then
+	  let _ = lexer#push_token [t] in 
+	  warn (s^" probably means "^((function Some(s) -> s) (reverse t)));
+	  yes_no lexer
+	  else 
+	  parse_error lexer "Please answer by yes or no followed by <enter>."
+	  | _ -> parse_error lexer "Please answer by yes or no followed by <enter>.")
+	*)
+	intelligent_parsing s [YES;NO] lexer (function () -> yes_no lexer) (function () -> parse_error lexer "Please answer by yes or no followed by <enter>.")
     | _ -> 
 	parse_error lexer "Please answer by yes or no followed by <enter>."
 	
@@ -395,14 +423,17 @@ let rec command lexer =
 	  Commands.Clear(ids);
     | IDENT(s) 
     | VAR(s) ->
-	(match find_nearest s (keywords [EXIT;RESET;HELP;IMPLICIT;PRINT;SHOW;STEP;LATEX;RATE;MAXRATE;LOAD;POP;PUSH;EQ;EQD;WEQ;WEQD;AGENT;CLEAR]) with
-	     Some(d,t) ->
-	       if d <= 1. then
-		 let _ = lexer#push_token [t] in 
-		   warn (s^" probably means "^((function Some(s) -> s) (reverse t)));
-		   command lexer
-	       else 
-		 parse_error lexer "Invalid command."
-	   | _ -> parse_error lexer "Invalid command.")
+	(*
+	  (match find_nearest s (keywords [EXIT;RESET;HELP;IMPLICIT;PRINT;SHOW;STEP;LATEX;RATE;MAXRATE;LOAD;POP;PUSH;EQ;EQD;WEQ;WEQD;AGENT;CLEAR]) with
+	  Some(d,t) ->
+	  if d <= 1. then
+	  let _ = lexer#push_token [t] in 
+	  warn (s^" probably means "^((function Some(s) -> s) (reverse t)));
+	  command lexer
+	  else 
+	  parse_error lexer "Invalid command."
+	  | _ -> parse_error lexer "Invalid command.")
+	*)
+	intelligent_parsing s [EXIT;RESET;HELP;IMPLICIT;PRINT;SHOW;STEP;LATEX;RATE;MAXRATE;LOAD;POP;PUSH;EQ;EQD;WEQ;WEQD;AGENT;CLEAR] lexer (function () -> command lexer) (function () -> parse_error lexer "Invalid command.")
     | _ -> 
 	parse_error lexer "Invalid command."
