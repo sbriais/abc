@@ -15,6 +15,7 @@
 #  USA. 
 *)
 open Agent
+open Bisimulation
 
 (* quelques fonctions d'impression *)
 let string_of_var lvl n = 

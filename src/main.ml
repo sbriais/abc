@@ -60,7 +60,7 @@ let rec step_agent org comp_org comp_comm comms =
 	    done;
 	    if (!choix) > 0 then
 	      let (c,a,p) = List.nth comms ((!choix)-1) in
-		step_agent (comp_org p) comp_org comp_comm (Agent.Commitments.elements (comp_comm (c,a,p)))
+		step_agent (comp_org p) comp_org comp_comm (Semantic.Commitments.elements (comp_comm (c,a,p)))
 	    else ()
 	end
 
@@ -143,8 +143,8 @@ let rec handle_command = function
       begin
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
-	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim,(ta,tb)) = Agent.eq env a b d in
+	let d = Bisimulation.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Bisimulation.eq env a b d in
 	  (match n with
 	       0 -> 
 		 !Formatter.format#print_string ("The two agents are not strongly related ("^(string_of_int (List.length ta))^").");
@@ -160,8 +160,8 @@ let rec handle_command = function
       begin
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
-	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim,(ta,tb)) = Agent.weq env a b d in
+	let d = Bisimulation.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Bisimulation.weq env a b d in
 	  (match n with
 	       0 -> 
 		 !Formatter.format#print_string ("The two agents are not weakly related ("^(string_of_int (List.length ta))^").");
@@ -177,8 +177,8 @@ let rec handle_command = function
       begin
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
-	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim,(ta,tb)) = Agent.lt env a b d in
+	let d = Bisimulation.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Bisimulation.lt env a b d in
 	  (match n with
 	       0 -> 
 		 !Formatter.format#print_string ("The two agents are not strongly related ("^(string_of_int (List.length ta))^").");
@@ -194,8 +194,8 @@ let rec handle_command = function
       begin
 	let fn = Agent.NameSet.union (Agent.free_names env a) (Agent.free_names env b) in
 	let l = Agent.NameSet.elements (Agent.NameSet.inter (Agent.set_of_list l) fn) in
-	let d = Agent.dist_of_lists l (Agent.NameSet.elements fn) in
-	let (n,bisim,(ta,tb)) = Agent.wlt env a b d in
+	let d = Bisimulation.dist_of_lists l (Agent.NameSet.elements fn) in
+	let (n,bisim,(ta,tb)) = Bisimulation.wlt env a b d in
 	  (match n with
 	       0 -> 
 		 !Formatter.format#print_string ("The two agents are not weakly related ("^(string_of_int (List.length ta))^").");
@@ -210,7 +210,7 @@ let rec handle_command = function
   | Show(a) -> 
       begin
 	!Formatter.format#open_box 0;
-	Pprinter.pp_agent 0 (Agent.standard_form env 0 a);
+	Pprinter.pp_agent 0 (Semantic.standard_form env 0 a);
 	!Formatter.format#close_box();
 	!Formatter.format#print_newline()
       end
@@ -303,9 +303,9 @@ let rec handle_command = function
       begin
 	step_agent
 	  a
-	  (Agent.concretise env)
-	  (fun (_,_,p) -> Agent.next_commitments env p) 
-	  (Agent.Commitments.elements (Agent.next_commitments env (Agent.standard_form env 0 a)))
+	  (Semantic.concretise env)
+	  (fun (_,_,p) -> Bisimulation.next_commitments env p) 
+	  (Semantic.Commitments.elements (Bisimulation.next_commitments env (Semantic.standard_form env 0 a)))
       end
   | Push(l) ->
       begin
@@ -367,10 +367,10 @@ let rec handle_command = function
 	!Formatter.format#print_string "   further information can be found in the ABC user guide";!Formatter.format#print_newline();
       end
   | Rate(n) ->
-      if (0 <= n) && (n <= !Agent.max_rate) then
+      if (0 <= n) && (n <= !Semantic.max_rate) then
 	begin
-	  Agent.buffer_switch n;
-	  !Formatter.format#print_string ("Caching rate is now "^(string_of_int !Agent.buffer_rate)^"/"^(string_of_int (!Agent.max_rate))^".");
+	  Semantic.buffer_switch n;
+	  !Formatter.format#print_string ("Caching rate is now "^(string_of_int !Semantic.buffer_rate)^"/"^(string_of_int (!Semantic.max_rate))^".");
 	end
       else
 	!Formatter.format#print_string "Invalid rate.";
@@ -378,8 +378,8 @@ let rec handle_command = function
   | Maxrate(n) ->
       if n > 0 then
 	begin
-	  Agent.set_maxrate n;
-	  !Formatter.format#print_string ("Caching rate is now "^(string_of_int !Agent.buffer_rate)^"/"^(string_of_int (!Agent.max_rate))^".");
+	  Semantic.set_maxrate n;
+	  !Formatter.format#print_string ("Caching rate is now "^(string_of_int !Semantic.buffer_rate)^"/"^(string_of_int (!Semantic.max_rate))^".");
 	end
       else
 	!Formatter.format#print_string "Invalid bound.";
