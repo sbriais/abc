@@ -1,76 +1,72 @@
 (* we played a bit with an "efficient" representation of integer *)
 (* the data type is (ocaml style): *)
-(* type integer = Zero | Double of integer | DoubleS of integer *)
+(* type integer = Z | SD of integer | D of integer *)
 (* it is interpreted as: *)
-(* [Zero] = 0 *)
-(* [Double(n)] = 2*[n]+2 *)
-(* [DoubleS(n)] = 2*[n]+1 *)
+(* [Z] = 0 *)
+(* [SD(n)] = 2*[n]+1 *)
+(* [D(n)] = 2*[n] *)
 (* These integers are not persistent *)
+
+(* we first define three "constructors" *)
+
 push l
-agent Zero = l(z,d,ds).'z
-agent Double(n) = (^k)(l(z,d,ds).'d<k> | 'n<k>)
-agent DoubleS(n) = (^k)(l(z,d,ds).'ds<k> | 'n<k>)
-agent BinIntMatch(caseZero,caseDouble,caseDoubleS) = 'l<caseZero,caseDouble,caseDoubleS>
+agent Z = l(z,sd,d).'z
+agent SD(n) = l(z,sd,d).'sd<n>
+agent D(n) = l(z,sd,d).'d<n>
 pop
 
 (* Move moves the integer at location l to location m *)
 agent Move(l,m) = \
-	(^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.Zero(m) \
-		    + caseDouble(lp).m(z,d,ds).'d<lp> \
-		    + caseDoubleS(lp).m(z,d,ds).'ds<lp>))
+	(^caseZ,caseSD,caseD) \
+		(  'l<caseZ,caseSD,caseD> \
+		 | (  caseZ.Z(m) \
+		    + caseSD(lp).SD(m,lp) \
+		    + caseD(lp).D(m,lp)))
 
-agent Un(l) = (^k)(l(z,d,ds).'ds<k> | Zero(k))
+(* Copy copys the integer at location l to location m and n *)
+agent Copy(l,m,n) = \
+	(^caseZ,caseSD,caseD) \
+		(  'l<caseZ,caseSD,caseD> \
+		 | (  caseZ.(Z(m) | Z(n)) \
+		    + caseSD(lp).(^mp,np)(SD(m,mp) | SD(n,np) | Copy(lp,mp,np)) \
+		    + caseD(lp).(^mp,np)(D(m,mp) | D(n,np) | Copy(lp,mp,np))))
 
-(* Succ computes the successor of the integer at location l and put it at location m *)
+agent Zero(l) = Z(l)
+agent One(l) = (^k)(SD(l,k) | Zero(k))
+
+(* Succ computes the successor of the integer located at l and put it at m *)
 agent Succ(l,m) = \
-	(^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.Un(m) \
-		    + caseDouble(lp).((^k)(m(z,d,ds).'ds<k> | Succ(lp,k))) \
-		    + caseDoubleS(lp).m(z,d,ds).'d<lp>))
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.One(m) \
+                   + caseSD(lp).(^mp)(D(m,mp) | Succ(lp,mp)) \
+                   + caseD(lp).SD(m,lp)))
 
-agent Copy(l,m,done) = \
-	(^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.(Zero(l) | Zero(m) | 'done) \
-		    + caseDouble(lp).((^copy)(Double(m,copy) | copy(k).(l(z,d,ds).'d<lp> | Copy(lp,k,done)))) \
-		    + caseDoubleS(lp).((^copy)(DoubleS(m,copy) | copy(k).(l(z,d,ds).'ds<lp> | Copy(lp,k,done))))))
-
-agent Deux(l) = (^k)(l(z,d,ds).'d<k> | Zero(k))
-agent Trois(l) = (^k)(l(z,d,ds).'ds<k> | Un(k))
-agent Quatre(l) = (^k)(l(z,d,ds).'d<k> | Un(k))
-agent Cinq(l) = (^k)(l(z,d,ds).'ds<k> | Deux(k))
-agent Six(l) = (^k)(l(z,d,ds).'d<k> | Deux(k))
-
+(* Add adds the two integers located at l and m and put the result at n *)
 agent Add(l,m,n) = \
-      (^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.Move(m,n) \
-		    + caseDouble(lp).(  BinIntMatch(m,caseZero,caseDouble,caseDoubleS) \
-		                      | (  caseZero.((^move)(Double(n,move) | move(np).Move(lp,np))) \
-				         + caseDouble(mp).((^add)(Double(n,add) | add(np).((^k)(Succ(k,np) | Add(lp,mp,k))))) \
-					 + caseDoubleS(mp).((^add)(DoubleS(n,add) | add(np).((^k)(Succ(k,np) | Add(lp,mp,k))))))) \
-		    + caseDoubleS(lp).(  BinIntMatch(m,caseZero,caseDouble,caseDoubleS) \
-		                      | (  caseZero.((^move)(DoubleS(n,move) | move(np).Move(lp,np))) \
-				         + caseDouble(mp).((^add)(DoubleS(n,add) | add(np).((^k)(Succ(k,np) | Add(lp,mp,k))))) \
-					 + caseDoubleS(mp).((^add)(Double(n,add) | add(np).Add(lp,mp,np)))))))
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.Move(m,n) \
+                   + caseSD(lp).(  'm<caseZ,caseSD,caseD> \
+                                 | (  caseZ.SD(n,lp) \
+                                    + caseSD(mp).(^np)(D(n,np) | (^lpmp)((Add(lp,mp,lpmp) | Succ(lpmp,np)))) \
+                                    + caseD(mp).(^np)(SD(n,np) | Add(lp,mp,np)))) \
+                   + caseD(lp).(   'm<caseZ,caseSD,caseD> \
+                                |  (  caseZ.D(n,lp) \
+                                    + caseSD(mp).(^np)(SD(n,np) | Add(lp,mp,np)) \
+                                    + caseD(mp).(^np)(D(n,np) | Add(lp,mp,np)))))) 
 
-agent Pred(l,m) = \      
-	(^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.Zero(m) \
-		    + caseDouble(lp).((^move)(DoubleS(m,move) | move(k).Move(lp,k))) \
-		    + caseDoubleS(lp).(  BinIntMatch(lp,caseZero,caseDouble,caseDoubleS) \
-		                      | (  caseZero.Zero(m) \
-				         + caseDouble(lpp).((^pred)(Double(m,pred) | pred(k).((^n)(Pred(n,k) | Double(n,pred) | pred(m).Move(lpp,m))))) \
-					 + caseDoubleS(lpp).((^pred)(Double(m,pred) | pred(k).((^n)(Pred(n,k) | DoubleS(n,pred) | pred(m).Move(lpp,m)))))))))
+agent Two(l) = (^k)(D(l,k) | One(k))
+agent Three(l) = (^k)(SD(l,k) | One(k))
+agent Four(l) = (^k)(D(l,k) | Two(k))
+agent Five(l) = (^k)(SD(l,k) | Two(k))
+agent Six(l) = (^k)(D(l,k) | Three(k))
 
+(* Mult multiplies the two integers located at l and m and put the result at n *)
+agent Mult(l,m,n) = \
+	(^caseZ,caseSD,caseD) \
+	       (  'l<caseZ,caseSD,caseD> \
+                | (  caseZ.Z(n) \
+                   + caseSD(lp).((^m1,m2)(Copy(m,m1,m2) | (^lpm)(Mult(lp,m1,lpm) | Add(lpm,m2,n)))) \
+                   + caseD(lp).(^np)(D(n,np) | Mult(lp,m,np))))
 
-agent Fois2(l,m) = \
-	(^caseZero,caseDouble,caseDoubleS) \
-		(  BinIntMatch(l,caseZero,caseDouble,caseDoubleS) \
-		 | (  caseZero.Zero(m) \
-		    + caseDouble(lp).((^fois2)(Double(m,fois2) | fois2(k).((^move)(DoubleS(k,move) | move(m).Move(lp,m))))) \
-		    + caseDoubleS(lp).((^fois2)(Double(m,fois2) | fois2(k).Fois2(lp,k)))))
