@@ -1,6 +1,6 @@
 INIT(abc)
 VERSION(1.0.5)
-SOURCES(agent.ml agent_parse.ml conditions.mli conditions.ml distinctions.mli distinctions.ml main.ml multiset.mli multiset.ml name.mli name.ml commands.ml pprinter.ml parser.ml compile_info.ml formatter.ml semantic.ml bisimulation.ml)
+SOURCES(agent.ml agent_parse.ml conditions.mli conditions.ml distinctions.mli distinctions.ml main.ml multiset.mli multiset.ml name.mli name.ml commands.ml pprinter.ml sprinter.ml parser.ml compile_info.ml formatter.ml semantic.ml bisimulation.ml)
 EXTRA(make_ocaml Makefile.in README LICENSE abc_ug.ps examples)
 USE_LEXER()
 dnl USE_PARSER()

@@ -114,7 +114,7 @@ let see_trace a b ta tb wk =
 		!Formatter.format#print_newline ();
 		Pprinter.pp_traces tp tq wk;
 		!Formatter.format#print_newline();
-		if (Pprinter.flush_entries Pprinter.pp_agent_meta) then !Formatter.format#force_newline()
+		if (Sprinter.flush_entries Pprinter.pp_agent_meta) then !Formatter.format#force_newline()
 	      in
 		show_traces a b ta tb
 	    end
@@ -134,7 +134,7 @@ let rec handle_command = function
 	  else
 	    begin
 	      !Formatter.format#print_string ("Agent "^s^" is not defined because there are free variables:");
-	      Agent.NameSet.iter (function n -> !Formatter.format#print_string (" "^(Pprinter.string_of_var 0 n))) fn;
+	      Agent.NameSet.iter (function n -> !Formatter.format#print_string (" "^(Sprinter.string_of_var 0 n))) fn;
 	      !Formatter.format#print_newline()
 	    end
       end
