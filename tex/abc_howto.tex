@@ -203,16 +203,17 @@ implements the algorithm we wanted (even if it is purely speculative).
 
 \subsection{Binders}
 One of the big technical problem that arises when implementing a tool
-that manipulates a language is the problem of binders. There are
-several ways to encode binders into a functional language like OCaml.
-One of the alternatives is to do a \emph{shallow embedding} and use
-the binders of the implementation language to encode the binder of the
-manipulated language. One problem of that embedding is it is then
-difficult to work on the structure of a term. This approach is good
-when the goal is to write an interpreter however. Another alternative
-is to do a \emph{deep embedding}: that means to handle binders of the
-manipulated language explicitly. De Bruijn indices is one technique to
-do deep embedding. The advantage is that $\alpha$-equivalent terms are
+that manipulates a language is the problem of binders (see for example
+\cite{Roeckl::Hirschkoff::2003}). There are several ways to encode
+binders into a functional language like OCaml.  One of the
+alternatives is to do a \emph{shallow embedding} and use the binders
+of the implementation language to encode the binder of the manipulated
+language. One problem of that embedding is it is then difficult to
+work on the structure of a term. This approach is good when the goal
+is to write an interpreter however. Another alternative is to do a
+\emph{deep embedding}: that means to handle binders of the manipulated
+language explicitly. De Bruijn indices is one technique to do deep
+embedding. The advantage is that $\alpha$-equivalent terms are
 represented as the same term. One disadvantage is that it is tedious
 and error-prone to write a substitution algorithm.  It is really easy
 to confuse indices. Another technique to do deep embedding is to use
