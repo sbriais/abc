@@ -1,3 +1,21 @@
 agent Zero(c) = c(z,s).'z.Zero(c)
 agent Succ(c,n) = c(z,s).'s<n>.Succ(c,n)
-agent Sup2(n,true,false) = (^caseZero,caseSucc)('n<caseZero,caseSucc> | (caseZero.'false + caseSucc(n).'n<caseZero,caseSucc>.(caseZero.'false + caseSucc(n).'true)))
+
+agent Sup2(n,true,false) = (^caseZero,caseSucc)('n<caseZero,caseSucc> | (caseZero.'false + caseSucc(n).'n<caseZero,caseSucc>.(caseZero.'false + caseSucc(n).'true<n>)))
+
+agent Joueur(n,left,right) =   left.(^c)(Succ(c,n) | Joueur(c,left,right)) \
+			     + right.(^c)(Succ(c,n) | Joueur(c,left,right)) \
+			     + (^caseTrue,caseFalse)(  Sup2(n,caseTrue,caseFalse) \
+						     | (  caseFalse.Joueur(n,left,right) \
+						        + caseTrue(n).'left.'right.Joueur(n,left,right)))
+
+agent Un(c) = (^n)(Succ(c,n) | Zero(n))
+agent Deux(c) = (^n)(Succ(c,n) | Un(n))
+agent Trois(c) = (^n)(Succ(c,n) | Deux(n))
+
+agent Sys = (^l0,l1,l2,n0,n1,n2)(  Joueur(n0,l2,l0) | Deux(n0) \
+                                 | Joueur(n1,l0,l1) | Zero(n1) \
+                                 | Joueur(n2,l1,l2) | Zero(n2))
+
+agent Inf = t.Inf
+
