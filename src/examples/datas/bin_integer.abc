@@ -9,11 +9,9 @@
 
 (* we first define three "constructors" *)
 
-push l
-agent Z = l(z,sd,d).'z
-agent SD(n) = l(z,sd,d).'sd<n>
-agent D(n) = l(z,sd,d).'d<n>
-pop
+agent Z(l) = l(z,sd,d).'z
+agent SD(l,n) = l(z,sd,d).'sd<n>
+agent D(l,n) = l(z,sd,d).'d<n>
 
 (* Move moves the integer at location l to location m *)
 agent Move(l,m) = \
@@ -34,7 +32,7 @@ agent Copy(l,m,n) = \
 agent Zero(l) = Z(l)
 agent One(l) = (^k)(SD(l,k) | Zero(k))
 
-(* Succ computes the successor of the integer located at l and put it at m *)
+(* Succ computes the successor of the integer located at l and puts it at m *)
 agent Succ(l,m) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
@@ -42,7 +40,7 @@ agent Succ(l,m) = \
                    + caseSD(lp).(^mp)(D(m,mp) | Succ(lp,mp)) \
                    + caseD(lp).SD(m,lp)))
 
-(* Add adds the two integers located at l and m and put the result at n *)
+(* Add adds the two integers located at l and m and puts the result at n *)
 agent Add(l,m,n) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
@@ -62,7 +60,7 @@ agent Four(l) = (^k)(D(l,k) | Two(k))
 agent Five(l) = (^k)(SD(l,k) | Two(k))
 agent Six(l) = (^k)(D(l,k) | Three(k))
 
-(* Mult multiplies the two integers located at l and m and put the result at n *)
+(* Mult multiplies the two integers located at l and m and puts the result at n *)
 agent Mult(l,m,n) = \
 	(^caseZ,caseSD,caseD) \
 	       (  'l<caseZ,caseSD,caseD> \
