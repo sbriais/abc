@@ -49,8 +49,8 @@ object(self)
 end
 
 let warn s = 
-  Format.print_string ("WARNING: "^s);
-  Format.print_newline()
+  !Formatter.format#print_string ("WARNING: "^s);
+  !Formatter.format#print_newline()
 
 let parse_token t lexer error =
   if lexer#pop_token = t then ()

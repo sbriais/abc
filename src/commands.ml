@@ -35,3 +35,4 @@ type command =
   | Push of (Name.t list)
   | Pop of int
   | Clear of (string list)
+  | List of (command list)

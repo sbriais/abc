@@ -13,7 +13,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
-VERSION=1.0.4
+VERSION=1.0.5
 CC=gcc
 CFLAGS=-O2
 CAMLC=ocamlc
@@ -36,12 +36,12 @@ CAMLLIBPATH=`$CAMLC -where`
 LIBS =  unix.cma
 MMAKE=make_ocaml
 LEXERANDPARSER=lexer.mll
-DISTML= agent.ml agent_parse.ml  conditions.ml  distinctions.ml main.ml  multiset.ml  name.ml commands.ml pprinter.ml parser.ml compile_info.ml
+DISTML= agent.ml agent_parse.ml  conditions.ml  distinctions.ml main.ml  multiset.ml  name.ml commands.ml pprinter.ml parser.ml compile_info.ml formatter.ml
 SPECML= lexer.ml
-DISTMLI=   conditions.mli  distinctions.mli   multiset.mli  name.mli      
+DISTMLI=   conditions.mli  distinctions.mli   multiset.mli  name.mli       
 SPECMLI= 
-CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multiset.cmi name.cmi commands.cmi pprinter.cmi parser.cmi compile_info.cmi conditions.cmi distinctions.cmi multiset.cmi name.cmi  lexer.cmi  
-OBJS= conditions.cmo distinctions.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo compile_info.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
+CMI = agent.cmi agent_parse.cmi conditions.cmi distinctions.cmi main.cmi multiset.cmi name.cmi commands.cmi pprinter.cmi parser.cmi compile_info.cmi formatter.cmi conditions.cmi distinctions.cmi multiset.cmi name.cmi  lexer.cmi  
+OBJS= conditions.cmo distinctions.cmo formatter.cmo multiset.cmo name.cmo agent.cmo agent_parse.cmo commands.cmo compile_info.cmo lexer.cmo parser.cmo pprinter.cmo main.cmo
 CMX = $(OBJS:.cmo=.cmx)
 
 EXTRADIST = make_ocaml Makefile.am README LICENSE abc_ug.ps examples Makefile

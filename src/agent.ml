@@ -867,8 +867,8 @@ let bisim_neq bisim p q d =
   (str^(if str = "" then "" else " | ")^strp)) "" (AgentMultiset.elements ps)) 
   in "("^str^")"
   
-  let print_action a = Format.print_string (string_of_action 0 a) 
-  let print_agent p = Format.print_string (string_of_agent 0 p)
+  let print_action a = !Formatter.format#print_string (string_of_action 0 a) 
+  let print_agent p = !Formatter.format#print_string (string_of_agent 0 p)
 *)
 
 (*
@@ -939,8 +939,8 @@ end
   method clear = 
   Stack.clear action_stack;
   method print (pp_action:'a->unit) =
-  let exec_action = ref [Format.print_newline] in
-  Stack.iter (function a -> exec_action := (function () -> pp_action a;Format.print_string " ")::(!exec_action)) action_stack;
+  let exec_action = ref [!Formatter.format#print_newline] in
+  Stack.iter (function a -> exec_action := (function () -> pp_action a;!Formatter.format#print_string " ")::(!exec_action)) action_stack;
   List.iter (function f -> f ()) (!exec_action)
   method enter = self
   end	
@@ -984,7 +984,7 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
   if b then 
     begin
 (*
-      Format.print_string "exit 1";Format.print_newline();
+      !Formatter.format#print_string "exit 1";!Formatter.format#print_newline();
 *)
       ((bisim_empty bisim p q d tp tq),(tp,tq))
     end
@@ -996,15 +996,15 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
     if (bisim_exists bisim p q d r) then 
       begin
 (*
-	Format.print_string "exit 2";Format.print_newline();
+	!Formatter.format#print_string "exit 2";!Formatter.format#print_newline();
 *)
 	(r,([],[]))
       end
     else 
-      if (compare p q = 0) then 
+      if (compare p q = 0) && false then 
 	begin
 (*
-	  Format.print_string "exit 3";Format.print_newline();
+	  !Formatter.format#print_string "exit 3";!Formatter.format#print_newline();
 *)
 	  (bisim_add bisim p q d r,([],[]))
 	end
@@ -1071,7 +1071,7 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 			  else 
 			    begin
 (*
-			      Format.print_string "exit 4";Format.print_newline();
+			      !Formatter.format#print_string "exit 4";!Formatter.format#print_newline();
 *)
 			      ((bisim_empty bisim p q d [] []),([],[]))
 			    end
@@ -1079,25 +1079,25 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 		    else 
 		      begin
 (*
-			Format.print_string "exit 5";Format.print_newline();
+			!Formatter.format#print_string "exit 5";!Formatter.format#print_newline();
 *)
 			((bisim_empty bisim p q d [] []),([],[]))
 		      end
 		end
 	  else 
 	    begin
-(*	      Format.print_string "Incompatible arities.";Format.print_newline(); *)
+(*	      !Formatter.format#print_string "Incompatible arities.";!Formatter.format#print_newline(); *)
 (*
-	      Format.print_string "exit 6";Format.print_newline();
+	      !Formatter.format#print_string "exit 6";!Formatter.format#print_newline();
 *)
 	      ((bisim_empty bisim p q d [] []),([],[]))
 	    end
 and matches bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p_weak trace_q_strong *) p_comm q_comm d  r =
   if Bisimulations.is_empty r then 
     begin
-(*      Format.print_string "Bisim empty.";Format.print_newline(); *)
+(*      !Formatter.format#print_string "Bisim empty.";!Formatter.format#print_newline(); *)
 (*
-      Format.print_string "exit 7";Format.print_newline();
+      !Formatter.format#print_string "exit 7";!Formatter.format#print_newline();
 *)
       (Bisimulations.empty,([],[]))
     end
@@ -1105,7 +1105,7 @@ and matches bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
     if Commitments.is_empty p_comm then 
       begin
 (*
-	Format.print_string "exit 8";Format.print_newline();
+	!Formatter.format#print_string "exit 8";!Formatter.format#print_newline();
 *)
 	(r,([],[]))
       end
