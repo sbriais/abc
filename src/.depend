@@ -7,10 +7,10 @@ conditions.cmo: conditions.cmi
 conditions.cmx: conditions.cmi 
 distinctions.cmo: conditions.cmi distinctions.cmi 
 distinctions.cmx: conditions.cmx distinctions.cmi 
-main.cmo: agent.cmo agent_parse.cmo commands.cmo formatter.cmo parser.cmo \
-    pprinter.cmo 
-main.cmx: agent.cmx agent_parse.cmx commands.cmx formatter.cmx parser.cmx \
-    pprinter.cmx 
+main.cmo: agent.cmo agent_parse.cmo commands.cmo compile_info.cmo \
+    formatter.cmo lexer.cmo parser.cmo pprinter.cmo 
+main.cmx: agent.cmx agent_parse.cmx commands.cmx compile_info.cmx \
+    formatter.cmx lexer.cmx parser.cmx pprinter.cmx 
 multiset.cmo: multiset.cmi 
 multiset.cmx: multiset.cmi 
 name.cmo: name.cmi 
@@ -19,5 +19,5 @@ commands.cmo: agent.cmo name.cmi
 commands.cmx: agent.cmx name.cmx 
 pprinter.cmo: agent.cmo agent_parse.cmo formatter.cmo name.cmi 
 pprinter.cmx: agent.cmx agent_parse.cmx formatter.cmx name.cmx 
-parser.cmo: agent.cmo agent_parse.cmo commands.cmo formatter.cmo 
-parser.cmx: agent.cmx agent_parse.cmx commands.cmx formatter.cmx 
+parser.cmo: agent.cmo agent_parse.cmo commands.cmo formatter.cmo lexer.cmo 
+parser.cmx: agent.cmx agent_parse.cmx commands.cmx formatter.cmx lexer.cmx 
