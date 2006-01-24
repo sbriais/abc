@@ -101,6 +101,6 @@ depend: .depend
 	@$(CAMLDEP) $(COMMONFLAGS) $(DISTMLI) $(DISTML) $(SPECML) $(SPECMLI) > .depend
 
 dist:	
-	tar cvfz $(PRGM)-$(VERSION).tar.gz --exclude compile_info.ml $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) 
+	tar cvfz $(PRGM)-$(VERSION).tar.gz --exclude compile_info.ml --exclude CVS $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) 
 
 -include .depend

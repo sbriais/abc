@@ -13,7 +13,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
-VERSION=1.0.5
+VERSION=1.0.6
 CC=gcc
 CFLAGS=-O2
 CAMLC=ocamlc
@@ -101,6 +101,6 @@ depend: .depend
 	@$(CAMLDEP) $(COMMONFLAGS) $(DISTMLI) $(DISTML) $(SPECML) $(SPECMLI) > .depend
 
 dist:	
-	tar cvfz $(PRGM)-$(VERSION).tar.gz --exclude compile_info.ml $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) 
+	tar cvfz $(PRGM)-$(VERSION).tar.gz --exclude compile_info.ml --exclude CVS $(DISTMLI) $(DISTML) $(SPECIAL) $(LEXERANDPARSER) 
 
 -include .depend
