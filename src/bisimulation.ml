@@ -140,7 +140,7 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 	(r,([],[]))
       end
     else 
-      if (compare p q = 0) && false then 
+      if (if false then (compare p q = 0) else false) then 
 	begin
 (*
 	  !Formatter.format#print_string "exit 3";!Formatter.format#print_newline();

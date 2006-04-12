@@ -28,7 +28,7 @@ let pred = function
     0 -> failwith "Name.pred"
   | n -> (n-1)
 
-let compare x y = compare x y
+let compare x y = (x-y)-(y-x)
 
 let is_zero = function
     0 -> true

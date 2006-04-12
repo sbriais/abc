@@ -13,7 +13,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
-VERSION=1.0.6
+VERSION=1.0.7
 CC=gcc
 CFLAGS=-O2
 CAMLC=ocamlc
@@ -25,7 +25,7 @@ CAMLYACC=ocamlyacc
 CAMLDEP=ocamldep
 CAMLDOC=ocamldoc
 DOT=dot
-COMPFLAGS=   -ccopt $(CFLAGS)
+COMPFLAGS= -unsafe  -ccopt $(CFLAGS)
 LINKFLAGS=  
 COMMONFLAGS= 
 LEXFLAGS=

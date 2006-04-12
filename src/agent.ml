@@ -243,7 +243,7 @@ let set_of_list l =
 module AgentMap = Map.Make(struct
 			     type t = int * agent
 			     let compare (n,p) (m,q) =
-			       match Pervasives.compare n m with
+			       match (n-m)-(m-n) with
 				   0 -> compare p q
 				 | t -> t
 			   end)
