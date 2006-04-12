@@ -16,6 +16,21 @@
 *)
 module NameCond = Conditions.Make(Name)
 
+let string_compare s t =
+  let n = String.length s 
+  and m = String.length t 
+  in
+    match n-m with
+      | 0 -> 
+	  let i = ref 0 in
+	  let r = ref 0 in
+	    while (!i < n) && (!r = 0) do
+	      r := (Char.code s.[!i]) - (Char.code t.[!i]);
+	      incr i
+	    done;
+	    !r
+      | t -> t
+	  
 (* les trois types d'action possibles *)
 type action = Tau
 	      | Input of Name.t
@@ -85,7 +100,7 @@ let rec compare_agent multiset_cmp x y =
 	   | t -> t)
     | Match(_),_ -> -1
     | _,Match(_) -> 1
-    | AgentRef(s),AgentRef(t) -> Pervasives.compare s t
+    | AgentRef(s),AgentRef(t) -> string_compare s t
     | AgentRef(_),_ -> -1
     | _,AgentRef(_) -> 1
     | Apply(p,n),Apply(q,m) -> 
@@ -151,7 +166,7 @@ exception Not_defined of string
 (* un petit hack pour calculer les noms libres d'un agent nommé *)
 module StringSet = Set.Make(struct
 			      type t = string
-			      let compare = Pervasives.compare
+			      let compare = string_compare
 			    end)
 
 let free_names env p =

@@ -100,10 +100,10 @@ struct
 	   | _ -> false)
 
   let rec add (x:elt) n = function
-      ([]:t) -> ([x,max n 1]:t)
+      ([]:t) -> ([x,n]:t)
     | (y,p)::tail ->
 	(match Ord.compare compare x y with
-	     0 -> (y,p+(max n 1))::tail
+	     0 -> (y,p+n)::tail
 	   | t when t < 0 -> (y,p)::(add x n tail)
 	   | _ -> (x,n)::(y,p)::tail)
 
