@@ -339,7 +339,7 @@ let rec handle_command = function
 	!Formatter.format#print_string ("ABC v. "^(Compile_info.version));!Formatter.format#print_newline ();
 	!Formatter.format#print_string (Compile_info.build_info);!Formatter.format#print_newline ();
 	!Formatter.format#print_string (Compile_info.date_of_compile);!Formatter.format#print_newline ();
-	!Formatter.format#print_string ("(c) 2002-2006 SÃ©bastien Briais");!Formatter.format#print_newline ();
+	!Formatter.format#print_string ("(c) 2002-2006 Sébastien Briais");!Formatter.format#print_newline ();
 	!Formatter.format#print_string "---";!Formatter.format#print_newline ();
 	!Formatter.format#print_string "agent <Name[(params)]> = <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "   define the agent <Name(params)> with the body <agent>";!Formatter.format#print_newline();
@@ -359,6 +359,9 @@ let rec handle_command = function
 	!Formatter.format#print_string "   generate LaTeX code for <agent> (use some LaTeX macros)";!Formatter.format#print_newline();
 	!Formatter.format#print_string "step <agent>";!Formatter.format#print_newline();
 	!Formatter.format#print_string "   interactive exploration of the commitments of <agent>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "value <n>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "scale <m>";!Formatter.format#print_newline();
+	!Formatter.format#print_string "   change the caching rate to n/m";!Formatter.format#print_newline();
 	!Formatter.format#print_string "reset";!Formatter.format#print_newline();
 	!Formatter.format#print_string "   reinitialise the workbench";!Formatter.format#print_newline();
 	!Formatter.format#print_string "exit";!Formatter.format#print_newline();
