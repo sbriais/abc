@@ -399,26 +399,51 @@ let rec commitments env lvl p =
 		Commitments.union (commitments env lvl (standard_form env lvl p)) comms) ps Commitments.empty
 	 | Parallel(ps) -> (* PAR rules *)
 	     let ps = AgentMultiset.elements_packed ps in
-	     let comm_ps = List.map 
-			     (function (p,n) -> 
-				let comm_p = commitments env lvl (standard_form env lvl p) in
-				  Commitments.fold (fun ((c,a,p') as comm) comms ->
-						      let ar = arity p' in
-							(ar,comm)::comms) comm_p []) ps in
-	     let input_comms = Array.of_list 
-				 (List.map 
-				    (function comm_p -> 
-				       List.filter 
-				       (function (n,(_,Input(_),_)) -> (n >= 0) | _ -> false) comm_p) comm_ps) in
-	     let output_comms = Array.of_list 
-				  (List.map 
-				     (function comm_p -> 
-					List.filter 
-					(function (n,(_,Output(_),_)) -> (n <= 0) | _ -> false) comm_p) comm_ps) in
+	       (* new version *)
 	     let agents = Array.of_list ps in
-	       Commitments.union 
-		 (compute_par_rule env lvl agents (Array.of_list comm_ps)) 
+	     let n = Array.length agents in
+	     let input_comms = Array.make n []
+	     and output_comms = Array.make n [] in
+	     let comm_ps = Array.init n (fun i ->
+					   let (p,n) = agents.(i) in
+					   let comm_p = commitments env lvl (standard_form env lvl p) in
+					     Commitments.fold (fun ((c,a,p') as comm) comms ->
+								 let ar = arity p' in
+								 let ncomm=(ar,comm) in
+								   begin
+								     match a with
+								       | Input(_) when ar >= 0 ->
+									   input_comms.(i) <- ncomm :: input_comms.(i)
+								       | Output(_) when ar <= 0 ->
+									   output_comms.(i) <- ncomm :: output_comms.(i)
+								       | _ -> ()
+								   end;
+								   ncomm::comms) comm_p [])
+	     in
+	       Commitments.union
+		 (compute_par_rule env lvl agents comm_ps)
 		 (compute_comm_rule env lvl agents input_comms output_comms)
+	       (* old version *)
+(* 	     let comm_ps = List.map *)
+(* 			     (function (p,n) -> *)
+(* 				let comm_p = commitments env lvl (standard_form env lvl p) in *)
+(* 				  Commitments.fold (fun ((c,a,p') as comm) comms -> *)
+(* 						      let ar = arity p' in *)
+(* 							(ar,comm)::comms) comm_p []) ps in *)
+(* 	     let input_comms = Array.of_list *)
+(* 				 (List.map *)
+(* 				    (function comm_p -> *)
+(* 				       List.filter *)
+(* 				       (function (n,(_,Input(_),_)) -> (n >= 0) | _ -> false) comm_p) comm_ps) in *)
+(* 	     let output_comms = Array.of_list *)
+(* 				  (List.map *)
+(* 				     (function comm_p -> *)
+(* 					List.filter *)
+(* 					(function (n,(_,Output(_),_)) -> (n <= 0) | _ -> false) comm_p) comm_ps) in *)
+(* 	     let agents = Array.of_list ps in *)
+(* 	       Commitments.union *)
+(* 		 (compute_par_rule env lvl agents (Array.of_list comm_ps)) *)
+(* 		 (compute_comm_rule env lvl agents input_comms output_comms) *)
 	 | Nu(p) -> (* RES rule *)
 	     let comm_p = commitments env (lvl+1) (standard_form env (lvl+1) p) in
 	       Commitments.fold 
