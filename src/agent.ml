@@ -115,7 +115,9 @@ module AgentMultiset = Multiset.Make(struct
 				     end)
 
 (* et on finit de définir la comparaison entre agents *)
-let compare = compare_agent AgentMultiset.compare
+let compare p q = 
+  if p == q then 0 
+  else compare_agent AgentMultiset.compare p q
 
 (* on définit le module des ensembles de noms *)
 module NameSet = Set.Make(struct
