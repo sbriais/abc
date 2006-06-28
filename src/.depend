@@ -7,12 +7,10 @@ conditions.cmo: conditions.cmi
 conditions.cmx: conditions.cmi 
 distinctions.cmo: conditions.cmi distinctions.cmi 
 distinctions.cmx: conditions.cmx distinctions.cmi 
-main.cmo: sprinter.cmo semantic.cmo pprinter.cmo parser.cmo lexer.cmo \
-    formatter.cmo compile_info.cmo commands.cmo bisimulation.cmo \
-    agent_parse.cmo agent.cmo 
-main.cmx: sprinter.cmx semantic.cmx pprinter.cmx parser.cmx lexer.cmx \
-    formatter.cmx compile_info.cmx commands.cmx bisimulation.cmx \
-    agent_parse.cmx agent.cmx 
+main.cmo: sprinter.cmo semantic.cmo pprinter.cmo parser.cmo formatter.cmo \
+    commands.cmo bisimulation.cmo agent_parse.cmo agent.cmo 
+main.cmx: sprinter.cmx semantic.cmx pprinter.cmx parser.cmx formatter.cmx \
+    commands.cmx bisimulation.cmx agent_parse.cmx agent.cmx 
 multiset.cmo: multiset.cmi 
 multiset.cmx: multiset.cmi 
 name.cmo: name.cmi 
@@ -23,8 +21,8 @@ pprinter.cmo: sprinter.cmo name.cmi formatter.cmo bisimulation.cmo agent.cmo
 pprinter.cmx: sprinter.cmx name.cmx formatter.cmx bisimulation.cmx agent.cmx 
 sprinter.cmo: name.cmi formatter.cmo agent_parse.cmo agent.cmo 
 sprinter.cmx: name.cmx formatter.cmx agent_parse.cmx agent.cmx 
-parser.cmo: lexer.cmo formatter.cmo commands.cmo agent_parse.cmo agent.cmo 
-parser.cmx: lexer.cmx formatter.cmx commands.cmx agent_parse.cmx agent.cmx 
+parser.cmo: formatter.cmo commands.cmo agent_parse.cmo agent.cmo 
+parser.cmx: formatter.cmx commands.cmx agent_parse.cmx agent.cmx 
 semantic.cmo: name.cmi agent.cmo 
 semantic.cmx: name.cmx agent.cmx 
 bisimulation.cmo: semantic.cmo name.cmi distinctions.cmi agent.cmo 

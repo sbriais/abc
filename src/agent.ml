@@ -100,7 +100,7 @@ let rec compare_agent multiset_cmp x y =
 	   | t -> t)
     | Match(_),_ -> -1
     | _,Match(_) -> 1
-    | AgentRef(s),AgentRef(t) -> string_compare s t
+    | AgentRef(s),AgentRef(t) -> String.compare s t
     | AgentRef(_),_ -> -1
     | _,AgentRef(_) -> 1
     | Apply(p,n),Apply(q,m) -> 

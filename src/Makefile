@@ -13,11 +13,11 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
-VERSION=1.0.7
+VERSION=1.0.8
 CC=gcc
 CFLAGS=-O2
 CAMLC=ocamlc
-CAMLOPT=ocamlopt 
+CAMLOPT=ocamlopt
 PRGM=abc
 CAMLLIBR=camllibr
 CAMLLEX=ocamllex
