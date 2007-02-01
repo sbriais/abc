@@ -19,6 +19,13 @@ open Semantic
 
 module NameDist = Distinctions.Make(Name)(NameCond)
 
+let fn_dist d = 
+  let rec aux s = function
+    | [] -> s
+    | (x,y)::l -> aux (NameSet.add x (NameSet.add y s)) l
+  in 
+    aux NameSet.empty (NameDist.elements d) 
+
 module Bisimulations = Set.Make(struct 
 				  type t = agent * agent * NameDist.t
 				  let compare (p,q,d) (p',q',d') =
@@ -104,17 +111,16 @@ let bisim_neq bisim p q d =
 	 (NameDist.subset d d')) (!not_bisim) in
     if rev then  (booleen,(!tq,!tp)) else (booleen,(!tp,!tq))
 
-(*
+
   let string_of_var lvl n = Name.to_string lvl n
 
-  let string_of_action lvl = function
-  Tau -> "t"
-  | Input(n) -> string_of_var lvl n
-  | Output(n) -> "'"^(string_of_var lvl n)
+(*   let string_of_action lvl = function *)
+(*   Tau -> "t" *)
+(*   | Input(n) -> string_of_var lvl n *)
+(*   | Output(n) -> "'"^(string_of_var lvl n) *)
   
-  let print_action a = !Formatter.format#print_string (string_of_action 0 a) 
-  let print_agent p = !Formatter.format#print_string (string_of_agent 0 p)
-*)
+(*   let print_action a = !Formatter.format#print_string (string_of_action 0 a)  *)
+(*   let print_agent p = !Formatter.format#print_string (string_of_agent 0 p) *)
 
 (* p and q must be in standard form *)
 (* bisim is a flag that indicates if we check simulation or bisimulation *)
@@ -179,7 +185,8 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 		  let (np,p') = split_abstraction env 0 p 
 		  and (nq,q') = split_abstraction env 0 q in
 		    assert (np = nq);
-		    let fnpq = NameSet.elements (NameSet.union (free_names env p) (free_names env q)) in
+		    (** BUGFIX: fresh names must not include names of the distinction *)
+		    let fnpq = NameSet.elements (NameSet.union (NameSet.union (free_names env p) (free_names env q)) (fn_dist d)) in
 		    let freshnames = Name.freshnames np fnpq in
 		    let sigma = Name.apply_substitution np freshnames (function n -> n) in
 		    let p'' = substitute_agent sigma p' 
@@ -194,7 +201,8 @@ let rec add bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 		    assert (List.length vp = List.length vq);
 		    if (np = nq) then
 		      begin
-			let fnpq = NameSet.elements (NameSet.union (free_names env p) (free_names env q)) in
+			(** BUGFIX: fresh names must not include names of the distinction *)
+			let fnpq = NameSet.elements (NameSet.union (NameSet.union (free_names env p) (free_names env q)) (fn_dist d)) in
 			let freshnames = Name.freshnames np fnpq in
 			let sigma = Name.apply_substitution np freshnames (function n -> n) in
 			let vp' = List.map sigma vp
@@ -258,6 +266,9 @@ and matches bisim env s_comm w_comm (* trace_p_strong trace_q_weak *) (* trace_p
 *)
 	begin
 	  let (m,alpha,p) = Commitments.min_elt p_comm in
+(* 	    !Formatter.format#print_string "looking for corresponding action"; *)
+(* 	    print_action alpha; *)
+(* 	    !Formatter.format#print_newline(); *)
 	  let sigma_m = NameCond.canonical_substitution m in
 	  let alpha' = substitute_action sigma_m 0 alpha
 	  and p' = substitute_agent sigma_m p 
