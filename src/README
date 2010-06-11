@@ -30,10 +30,10 @@ How to compile:
 cd /usr/local/abc
 
 * to build OCaml bytecode and the file 'abc'
-make
+ocamlbuild main.byte
 
 * to build native code (if available) and the file 'abc.opt'
-make opt
+ocamlbuild main.native
 
 Of course, if native code is available under your platform, we
 strongly advise you to build native code.
@@ -41,17 +41,9 @@ strongly advise you to build native code.
 How to use:
 -----------
 Depending on which target you have decided to build the ABC, type
-'/usr/local/abc/abc' or '/usr/local/abc/abc.opt' to launch the ABC.
-More detailed explanations can be found in the User's Guide.
+'/usr/local/abc/main.byte' or '/usr/local/abc/main.native' to launch
+the ABC.  More detailed explanations can be found in the User's Guide.
 Examples can be found in the subdirectory examples.
-
-How to rebuild the Makefile:
----------------------------- 
-The archive contains three files that permits to regenerate the
-Makefile: Makefile.am, Makefile.in and make_ocaml. The only file you
-may want to edit is Makefile.am. Then, the script make_ocaml inspects
-the file Makefile.am and builds with the help of the Makefile.in
-(which is some kind of pattern) a Makefile.
 
 Line editor:
 ------------
@@ -65,6 +57,8 @@ You can make a little shell script that launch abc with ledit:
 ledit /usr/local/abc/abc
 
 assuming that ledit is in your path.
+
+You may also use rlwrap instead of ledit.
 
 License:
 --------
