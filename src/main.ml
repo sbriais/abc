@@ -336,9 +336,9 @@ let rec handle_command = function
   | Nocommand -> ()
   | Help ->
       begin
-	!Formatter.format#print_string ("ABC v. "^(Compile_info.version));!Formatter.format#print_newline ();
-	!Formatter.format#print_string (Compile_info.build_info);!Formatter.format#print_newline ();
-	!Formatter.format#print_string (Compile_info.date_of_compile);!Formatter.format#print_newline ();
+	!Formatter.format#print_string ("ABC v. "^(Version.version));!Formatter.format#print_newline ();
+	!Formatter.format#print_string (Version.build_info);!Formatter.format#print_newline ();
+	!Formatter.format#print_string (Version.compile_time);!Formatter.format#print_newline ();
 	!Formatter.format#print_string ("(c) 2002-2006 Sebastien Briais");!Formatter.format#print_newline ();
 	!Formatter.format#print_string "---";!Formatter.format#print_newline ();
 	!Formatter.format#print_string "agent <Name[(params)]> = <agent>";!Formatter.format#print_newline();
