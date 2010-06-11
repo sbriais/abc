@@ -9,7 +9,8 @@ let time =
     (tm.tm_mon + 1) tm.tm_mday (tm.tm_year + 1900)
     tm.tm_hour tm.tm_min tm.tm_sec
 
-let build = Sys.os_type
+let build =
+  Printf.sprintf "ocaml = %s, os = %s" Sys.ocaml_version Sys.os_type
 
 let make_version _ _ =
   let cmd =
